@@ -7,7 +7,7 @@ using Zene.Windowing.Base;
 
 namespace Zene.Windowing
 {
-    public unsafe class Window : IDisposable
+    public unsafe class Window : IWindow, IDisposable
     {
         private Window(IntPtr window)
         {
@@ -119,14 +119,7 @@ namespace Zene.Windowing
         }
 
         private readonly IntPtr _window;
-        
-        public IntPtr Handle
-        {
-            get
-            {
-                return _window;
-            }
-        }
+        public IntPtr Handle => _window;
 
         private bool _disposed = false;
         public void Dispose()
@@ -490,12 +483,22 @@ namespace Zene.Windowing
             _baseFramebuffer.Size((int)e.Width, (int)e.Height);
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is Window window &&
+                   _window == window._window;
+        }
+        public override int GetHashCode() => HashCode.Combine(_window);
+
+        public static bool operator ==(Window l, Window r) => l.Equals(r);
+        public static bool operator !=(Window l, Window r) => !l.Equals(r);
+
         /// <summary>
         /// A null value window.
         /// </summary>
         public static Window None { get; } = new Window(IntPtr.Zero);
         /// <summary>
-        /// Creates a window from an already created window.
+        /// Creates a window object from an already created GLFW window.
         /// </summary>
         /// <param name="handle">The GLFW pointer to a window object.</param>
         /// <returns></returns>

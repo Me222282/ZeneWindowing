@@ -65,9 +65,9 @@ namespace Zene.Windowing
             GLFW.WindowHint(GLFW.RefreshRate, properties.RefreshRate);
         }
 
-        public static Window Context
+        public static IWindow Context
         {
-            get => GLFW.context;
+            get => null;
             set => GLFW.MakeContextCurrent(value);
         }
     }
