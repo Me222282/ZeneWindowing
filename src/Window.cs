@@ -58,7 +58,7 @@ namespace Zene.Windowing
                 throw new InvalidOperationException("Failed to create window.");
             }
 
-            GLFW.MakeContextCurrent(_window);
+            GLFW.MakeContextCurrent(this);
 
             // Full screen required properties
             _normalWidth = Width;
@@ -158,7 +158,7 @@ namespace Zene.Windowing
         public bool IsContext
         {
             get => GLFW.GetCurrentContext() == Handle;
-            set => GLFW.MakeContextCurrent(Handle);
+            set => GLFW.MakeContextCurrent(value ? this : null);
         }
 
         private readonly BaseFramebuffer _baseFramebuffer;
