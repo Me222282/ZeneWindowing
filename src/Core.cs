@@ -6,10 +6,7 @@ namespace Zene.Windowing
     public static class Core
     {
 #if AutoInit
-        static Core()
-        {
-            Init();
-        }
+        static Core() { Init(); }
 #endif
 
         private static bool _initialised = false;
@@ -67,7 +64,7 @@ namespace Zene.Windowing
 
         public static IWindow Context
         {
-            get => null;
+            get => GLFW.context;
             set => GLFW.MakeContextCurrent(value);
         }
     }

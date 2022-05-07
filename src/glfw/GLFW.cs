@@ -3472,6 +3472,9 @@ namespace Zene.Windowing.Base
 			return _glfwGetTimerFrequency();
 		}
 
+		[ThreadStatic]
+		internal static IWindow context;
+
 		/// <summary>
 		/// Makes the context of the specified window current for the calling
 		/// thread.
@@ -3488,6 +3491,8 @@ namespace Zene.Windowing.Base
 		/// </param>
 		public static void MakeContextCurrent(IWindow window)
 		{
+			context = window;
+
 			if (window == null)
             {
 				_glfwMakeContextCurrent(IntPtr.Zero);
