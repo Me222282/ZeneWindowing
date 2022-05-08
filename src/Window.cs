@@ -43,11 +43,7 @@ namespace Zene.Windowing
 
             Core.SetInitProperties(properties);
             RefreshRate = properties.RefreshRate;
-            _baseFramebuffer = new BaseFramebuffer(
-                properties.Stereoscopic,
-                properties.DoubleBuffered,
-                width, height);
-            _baseFramebuffer.Size(width, height);
+            _baseFramebuffer = new BaseFramebuffer();
 
             _window = GLFW.CreateWindow(width, height, title, properties.Monitor.Handle, properties.SharedWindow.Handle);
 
@@ -68,6 +64,16 @@ namespace Zene.Windowing
             SetCallBacks();
 
             State.Init(GLFW.GetProcAddress, version);
+
+            // Create graphics context
+            GraphicsContext = new GraphicsContext(
+                properties.Stereoscopic,
+                properties.DoubleBuffered,
+                width, height, version);
+            State.CurrentContext = GraphicsContext;
+
+            // Set framebuffer reference size
+            _baseFramebuffer.Size(width, height);
 
             // Setup debug callback - error output/display
             // If supported in current opengl version
@@ -120,6 +126,8 @@ namespace Zene.Windowing
 
         private readonly IntPtr _window;
         public IntPtr Handle => _window;
+
+        public GraphicsContext GraphicsContext { get; }
 
         private bool _disposed = false;
         public void Dispose()
@@ -480,7 +488,7 @@ namespace Zene.Windowing
         {
             SizePixelChange?.Invoke(this, e);
 
-            _baseFramebuffer.Size((int)e.Width, (int)e.Height);
+            _baseFramebuffer.Size(e.Width, e.Height);
         }
 
         public override bool Equals(object obj)

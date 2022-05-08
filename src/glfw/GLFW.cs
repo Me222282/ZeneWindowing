@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
+using Zene.Graphics;
 
 namespace Zene.Windowing.Base
 {
@@ -3492,6 +3493,14 @@ namespace Zene.Windowing.Base
 		public static void MakeContextCurrent(IWindow window)
 		{
 			context = window;
+			if (window == null)
+            {
+				State.CurrentContext = GraphicsContext.None;
+			}
+			else
+            {
+				State.CurrentContext = window.GraphicsContext;
+			}
 
 			if (window == null)
             {

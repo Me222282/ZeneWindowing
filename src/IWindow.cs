@@ -1,4 +1,5 @@
 ﻿using System;
+using Zene.Graphics;
 
 namespace Zene.Windowing
 {
@@ -11,6 +12,11 @@ namespace Zene.Windowing
         /// A pointer to the GLFW window object.
         /// </summary>
         public IntPtr Handle { get; }
+
+        /// <summary>
+        /// The OpenGL context data surrounding this GLFW window.
+        /// </summary>
+        public GraphicsContext GraphicsContext { get; }
 
         /// <summary>
         /// The width of the window's framebuffer.
