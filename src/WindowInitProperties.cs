@@ -31,7 +31,7 @@
         public int RefreshRate { get; set; } = -1;
 
         public Monitor Monitor { get; set; } = Monitor.None;
-        public Window SharedWindow { get; set; } = Window.None;
+        public IWindow SharedWindow { get; set; } = Window.None;
 
         public static WindowInitProperties Default { get; } = new WindowInitProperties();
     }

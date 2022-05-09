@@ -498,8 +498,24 @@ namespace Zene.Windowing
         }
         public override int GetHashCode() => HashCode.Combine(_window);
 
-        public static bool operator ==(Window l, Window r) => l.Equals(r);
-        public static bool operator !=(Window l, Window r) => !l.Equals(r);
+        public static bool operator ==(Window l, Window r)
+        {
+            if (l is null)
+            {
+                return r is null;
+            }
+
+            return l.Equals(r);
+        }
+        public static bool operator !=(Window l, Window r)
+        {
+            if (l is null)
+            {
+                return !(r is null);
+            }
+
+            return !l.Equals(r);
+        }
 
         /// <summary>
         /// A null value window.

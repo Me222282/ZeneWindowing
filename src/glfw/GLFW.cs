@@ -3493,21 +3493,15 @@ namespace Zene.Windowing.Base
 		public static void MakeContextCurrent(IWindow window)
 		{
 			context = window;
-			if (window == null)
-            {
-				State.CurrentContext = GraphicsContext.None;
-			}
-			else
-            {
-				State.CurrentContext = window.GraphicsContext;
-			}
 
 			if (window == null)
             {
+				State.CurrentContext = GraphicsContext.None;
 				_glfwMakeContextCurrent(IntPtr.Zero);
 				return;
 			}
 
+			State.CurrentContext = window.GraphicsContext;
 			_glfwMakeContextCurrent(window.Handle);
 		}
 
