@@ -2,8 +2,8 @@
 
 Temp
 
-Use the [clone](https://github.com/Me222282/ZeneWindowing/tree/clone) branch when using git clone.
+Use the [clone](https://github.com/Me222282/ZeneWindowing/tree/clone) branch when using git clone to include dependencies from the Zene Library.
 
 ## Credits
 
-GLFW Loader also by Zackary Snow(smack0007) - [Source Page](https://github.com/smack0007/GLFWDotNet)</br>
+GLFW Loader also by Zackary Snow(smack0007) - [Source Page](https://github.com/smack0007/GLFWDotNet)<br>
