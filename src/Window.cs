@@ -42,6 +42,7 @@ namespace Zene.Windowing
             }
 
             Core.SetInitProperties(properties);
+            _size = new Vector2I(width, height);
             RefreshRate = properties.RefreshRate;
             _baseFramebuffer = new BaseFramebuffer();
 
@@ -62,6 +63,7 @@ namespace Zene.Windowing
             _normalLocation = Location;
 
             SetCallBacks();
+            SetProps(properties);
 
             State.Init(GLFW.GetProcAddress, version);
 
@@ -84,6 +86,8 @@ namespace Zene.Windowing
                 GL.Enable(GLEnum.DebugOutput);
                 GL.DebugMessageCallback(OnDebugCallBack, null);
             }
+
+            Core.SetupErrorHandle();
 
             _title = title;
         }
@@ -213,68 +217,43 @@ namespace Zene.Windowing
 
         public int Width
         {
-            get
-            {
-                GLFW.GetWindowSize(_window, out int w, out _);
-
-                return w;
-            }
-            set
-            {
-                GLFW.SetWindowSize(_window, value, Height);
-            }
+            get => Size.X;
+            set => Size = new Vector2I(value, Height);
         }
         public int Height
         {
-            get
-            {
-                GLFW.GetWindowSize(_window, out _, out int h);
-
-                return h;
-            }
-            set
-            {
-                GLFW.SetWindowSize(_window, Width, value);
-            }
+            get => Size.Y;
+            set => Size = new Vector2I(Width, value);
         }
+        private Vector2I _size;
         public Vector2I Size
         {
-            get
-            {
-                GLFW.GetWindowSize(_window, out int w, out int h);
-
-                return new Vector2I(w, h);
-            }
+            get => _size;
             set
             {
                 GLFW.SetWindowSize(_window, value.X, value.Y);
+                _size = value;
             }
         }
 
+        private Vector2I _pos;
         public Vector2I Location
         {
-            get
-            {
-                GLFW.GetWindowPos(_window, out int x, out int y);
-
-                return new Vector2I(x, y);
-            }
+            get => _pos;
             set
             {
                 GLFW.SetWindowPos(_window, value.X, value.Y);
+                _pos = value;
             }
         }
+        private Vector2 _mousePos;
         public Vector2 MouseLocation
         {
-            get
-            {
-                GLFW.GetCursorPos(_window, out double x, out double y);
-
-                return new Vector2(x, y);
-            }
+            get => _mousePos;
             set
             {
                 GLFW.SetCursorPos(_window, value.X, value.Y);
+                _mousePos = value;
             }
         }
 
@@ -296,6 +275,23 @@ namespace Zene.Windowing
             }
         }
 
+        public CursorMode CursorMode
+        {
+            get => (CursorMode)GLFW.GetInputMode(_window, GLFW.Cursor);
+            set => GLFW.SetInputMode(_window, GLFW.Cursor, (int)value);
+        }
+
+        private bool _focused;
+        public bool Focused
+        {
+            get => _focused;
+            set
+            {
+                GLFW.SetWindowAttrib(_window, GLFW.Focused, value ? GLFW.True : GLFW.False);
+                _focused = value;
+            }
+        }
+
         private string _title;
         public string Title
         {
@@ -306,6 +302,17 @@ namespace Zene.Windowing
 
                 GLFW.SetWindowTitle(Handle, value);
             }
+        }
+
+        private void SetProps(WindowInitProperties props)
+        {
+            _focused = props.Focused;
+
+            GLFW.GetWindowPos(_window, out int x, out int y);
+            _pos = new Vector2I(x, y);
+
+            GLFW.GetCursorPos(_window, out double mx, out double my);
+            _mousePos = new Vector2(mx, my);
         }
 
         private GLFW.FileDropHandler _onFileDropCallBack;
@@ -450,6 +457,7 @@ namespace Zene.Windowing
         }
         protected virtual void OnMouseMove(MouseEventArgs e)
         {
+            _mousePos = e.Location;
             MouseMove?.Invoke(this, e);
         }
         protected virtual void OnMouseDown(MouseEventArgs e)
@@ -482,10 +490,12 @@ namespace Zene.Windowing
         }
         protected virtual void OnWindowMove(PositionEventArgs e)
         {
+            _pos = e.Location;
             WindowMove?.Invoke(this, e);
         }
         protected virtual void OnSizePixelChange(SizeChangeEventArgs e)
         {
+            _size = e.Size;
             SizePixelChange?.Invoke(this, e);
 
             _baseFramebuffer.Size(e.Width, e.Height);

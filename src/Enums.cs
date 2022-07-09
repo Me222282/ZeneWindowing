@@ -1,4 +1,6 @@
-﻿namespace Zene.Windowing
+﻿using Zene.Windowing.Base;
+
+namespace Zene.Windowing
 {
     public enum Keys
     {
@@ -157,5 +159,12 @@
         M7 = 6,
         M8 = Last,
         None = 8
+    }
+
+    public enum CursorMode
+    {
+        Normal = GLFW.CursorNormal,
+        Hidden = GLFW.CursorHidden,
+        Disabled = GLFW.CursorDisabled
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Zene.Graphics;
 using Zene.Windowing.Base;
 
 namespace Zene.Windowing
@@ -20,6 +21,23 @@ namespace Zene.Windowing
             }
 
             _initialised = true;
+        }
+
+        private static bool _errorHandling = false;
+        internal static void SetupErrorHandle()
+        {
+            if (_errorHandling) { return; }
+
+            _errorHandler = (error, description) => GLFWError(error, description);
+            GLFW.SetErrorCallback(_errorHandler);
+
+            _errorHandling = true;
+        }
+
+        private static GLFW.ErrorHandler _errorHandler;
+        private static void GLFWError(int type, string message)
+        {
+            Debugger.PushError($"GLFW Error: {message}");
         }
 
         public static void Terminate()
@@ -66,6 +84,12 @@ namespace Zene.Windowing
         {
             get => GLFW.context;
             set => GLFW.MakeContextCurrent(value);
+        }
+
+        public static double Timer
+        {
+            get => GLFW.GetTime();
+            set => GLFW.SetTime(value);
         }
     }
 }
