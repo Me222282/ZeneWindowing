@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Zene.Graphics;
 using Zene.Graphics.Base;
 using Zene.Structs;
@@ -315,6 +316,68 @@ namespace Zene.Windowing
             _mousePos = new Vector2(mx, my);
         }
 
+        protected ActionManager Actions { get; } = new ActionManager();
+
+        public bool SupportsAsync { get; protected set; } = false;
+
+        public void Run()
+        {
+            GLFW.SwapInterval(-1);
+
+            OnStart(new EventArgs());
+
+            while (GLFW.WindowShouldClose(_window) == GLFW.False)
+            {
+                Actions.Flush();
+
+                OnUpdate(new EventArgs());
+
+                GLFW.SwapBuffers(_window);
+                GLFW.PollEvents();
+            }
+
+            OnStop(new EventArgs());
+        }
+        public void RunAsync()
+        {
+            if (!SupportsAsync)
+            {
+                throw new Exception("Window does not support asynchronous window management.");
+            }
+
+            Thread thread = new Thread(() =>
+            {
+                IsContext = true;
+
+                GLFW.SwapInterval(-1);
+
+                OnStart(new EventArgs());
+
+                while (GLFW.WindowShouldClose(_window) == GLFW.False)
+                {
+                    Actions.Flush();
+
+                    OnUpdate(new EventArgs());
+
+                    GLFW.SwapBuffers(_window);
+                }
+
+                OnStop(new EventArgs());
+            })
+            {
+                Priority = ThreadPriority.Highest
+            };
+
+            IsContext = false;
+
+            thread.Start();
+
+            while (thread.IsAlive)
+            {
+                GLFW.WaitEvents();
+            }
+        }
+
         private GLFW.FileDropHandler _onFileDropCallBack;
         private GLFW.CharHandler _onTextInput;
         private GLFW.KeyChangeHandler _onKeyCallBack;
@@ -347,6 +410,10 @@ namespace Zene.Windowing
         public event EventHandler Closing;
         public event PositionEventHandler WindowMove;
         public event SizeChangeEventHandler SizePixelChange;
+
+        public event EventHandler Update;
+        public event EventHandler Start;
+        public event EventHandler Stop;
 
         private void SetCallBacks()
         {
@@ -499,6 +566,19 @@ namespace Zene.Windowing
             SizePixelChange?.Invoke(this, e);
 
             _baseFramebuffer.Size(e.Width, e.Height);
+        }
+
+        protected virtual void OnUpdate(EventArgs e)
+        {
+            Update?.Invoke(this, e);
+        }
+        protected virtual void OnStart(EventArgs e)
+        {
+            Start?.Invoke(this, e);
+        }
+        protected virtual void OnStop(EventArgs e)
+        {
+            Stop?.Invoke(this, e);
         }
 
         public override bool Equals(object obj)
