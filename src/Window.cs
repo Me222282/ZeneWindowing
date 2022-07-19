@@ -305,6 +305,13 @@ namespace Zene.Windowing
             }
         }
 
+        private double _timeOffset = 0d;
+        public double Timer
+        {
+            get => GLFW.GetTime() - _timeOffset;
+            set => _timeOffset = GLFW.GetTime() - value;
+        }
+
         private void SetProps(WindowInitProperties props)
         {
             _focused = props.Focused;

@@ -86,10 +86,6 @@ namespace Zene.Windowing
             set => GLFW.MakeContextCurrent(value);
         }
 
-        public static double Timer
-        {
-            get => GLFW.GetTime();
-            set => GLFW.SetTime(value);
-        }
+        public static double Time => GLFW.GetTime();
     }
 }
