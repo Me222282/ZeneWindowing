@@ -226,6 +226,7 @@ namespace Zene.Windowing
             get => Size.Y;
             set => Size = new Vector2I(Width, value);
         }
+        private readonly object _sizeRef = new object();
         private Vector2I _size;
         public Vector2I Size
         {
@@ -233,10 +234,14 @@ namespace Zene.Windowing
             set
             {
                 GLFW.SetWindowSize(_window, value.X, value.Y);
-                _size = value;
+                lock (_sizeRef)
+                {
+                    _size = value;
+                }
             }
         }
 
+        private readonly object _posRef = new object();
         private Vector2I _pos;
         public Vector2I Location
         {
@@ -244,9 +249,13 @@ namespace Zene.Windowing
             set
             {
                 GLFW.SetWindowPos(_window, value.X, value.Y);
-                _pos = value;
+                lock (_posRef)
+                {
+                    _pos = value;
+                }
             }
         }
+        private readonly object _mousePosRef = new object();
         private Vector2 _mousePos;
         public Vector2 MouseLocation
         {
@@ -254,7 +263,10 @@ namespace Zene.Windowing
             set
             {
                 GLFW.SetCursorPos(_window, value.X, value.Y);
-                _mousePos = value;
+                lock (_mousePosRef)
+                {
+                    _mousePos = value;
+                }
             }
         }
 
@@ -282,6 +294,7 @@ namespace Zene.Windowing
             set => GLFW.SetInputMode(_window, GLFW.Cursor, (int)value);
         }
 
+        private readonly object _focusedRef = new object();
         private bool _focused;
         public bool Focused
         {
@@ -289,7 +302,10 @@ namespace Zene.Windowing
             set
             {
                 GLFW.SetWindowAttrib(_window, GLFW.Focused, value ? GLFW.True : GLFW.False);
-                _focused = value;
+                lock (_focusedRef)
+                {
+                    _focused = value;
+                }
             }
         }
 
@@ -531,7 +547,10 @@ namespace Zene.Windowing
         }
         protected virtual void OnMouseMove(MouseEventArgs e)
         {
-            _mousePos = e.Location;
+            lock (_mousePosRef)
+            {
+                _mousePos = e.Location;
+            }
             MouseMove?.Invoke(this, e);
         }
         protected virtual void OnMouseDown(MouseEventArgs e)
@@ -552,6 +571,11 @@ namespace Zene.Windowing
         }
         protected virtual void OnFocus(FocusedEventArgs e)
         {
+            lock (_focusedRef)
+            {
+                _focused = true;
+            }
+
             Focus?.Invoke(this, e);
         }
         protected virtual void OnRefresh(EventArgs e)
@@ -564,15 +588,25 @@ namespace Zene.Windowing
         }
         protected virtual void OnWindowMove(PositionEventArgs e)
         {
-            _pos = e.Location;
+            lock (_posRef)
+            {
+                _pos = e.Location;
+            }
             WindowMove?.Invoke(this, e);
         }
         protected virtual void OnSizePixelChange(SizeChangeEventArgs e)
         {
-            _size = e.Size;
-            SizePixelChange?.Invoke(this, e);
+            lock (_sizeRef)
+            {
+                _size = e.Size;
+            }
 
-            _baseFramebuffer.Size(e.Width, e.Height);
+            Actions.Push(() =>
+            {
+                _baseFramebuffer.Size(e.Width, e.Height);
+            });
+
+            SizePixelChange?.Invoke(this, e);
         }
 
         protected virtual void OnUpdate(EventArgs e)
