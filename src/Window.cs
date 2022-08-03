@@ -604,6 +604,7 @@ namespace Zene.Windowing
             Actions.Push(() =>
             {
                 _baseFramebuffer.Size(e.Width, e.Height);
+                BaseFramebuffer.ViewSize = e.Size;
             });
 
             SizePixelChange?.Invoke(this, e);
