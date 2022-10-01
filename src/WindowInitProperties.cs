@@ -1,4 +1,6 @@
-﻿namespace Zene.Windowing
+﻿using Zene.Graphics;
+
+namespace Zene.Windowing
 {
     /// <summary>
     /// An object that manages all the per window initialization properties.

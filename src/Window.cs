@@ -384,7 +384,7 @@ namespace Zene.Windowing
             _mousePos = new Vector2(mx, my);
         }
 
-        protected ActionManager Actions { get; } = new ActionManager();
+        protected ActionManager Actions => GraphicsContext.Actions;
 
         public bool SupportsMultithreading { get; }
 
@@ -396,7 +396,7 @@ namespace Zene.Windowing
 
             while (GLFW.WindowShouldClose(_window) == GLFW.False)
             {
-                Actions.Flush();
+                GraphicsContext.Actions.Flush();
 
                 OnUpdate(new EventArgs());
 
