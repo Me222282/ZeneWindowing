@@ -10,6 +10,11 @@ namespace Zene.Windowing
             Size = new Vector2I(w, h);
         }
 
+        public SizeChangeEventArgs(Vector2I size)
+        {
+            Size = size;
+        }
+
         public int Width => Size.X;
         public int Height => Size.Y;
         public Vector2I Size { get; }

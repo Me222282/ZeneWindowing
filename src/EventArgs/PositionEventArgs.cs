@@ -9,6 +9,10 @@ namespace Zene.Windowing
         {
             Location = new Vector2I(x, y);
         }
+        public PositionEventArgs(Vector2I location)
+        {
+            Location = location;
+        }
 
         public int X => Location.X;
         public int Y => Location.Y;

@@ -341,6 +341,38 @@ namespace Zene.Windowing
             set => _timeOffset = GLFW.GetTime() - value;
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="key"/> is currently being pressed.
+        /// </summary>
+        /// <param name="key">THe key to query</param>
+        /// <returns></returns>
+        public bool this[Keys key]
+        {
+            get => GLFW.GetKey(_window, (int)key) == GLFW.Press;
+        }
+        /// <summary>
+        /// Determines whether <paramref name="mod"/> is currently active.
+        /// </summary>
+        /// <remarks>
+        /// Throws <see cref="NotSupportedException"/> if <paramref name="mod"/> is <see cref="Mods.CapsLock"/> or <see cref="Mods.NumLock"/>.
+        /// </remarks>
+        /// <param name="mod">The modifier to query.</param>
+        /// <exception cref="NotSupportedException"></exception>
+        /// <returns></returns>
+        public bool this[Mods mod]
+        {
+            get => mod switch
+            {
+                Mods.Shift => this[Keys.LeftShift] || this[Keys.RightShift],
+                Mods.Control => this[Keys.LeftControl] || this[Keys.RightControl],
+                Mods.Alt => this[Keys.LeftAlt] || this[Keys.RightAlt],
+                Mods.Super => this[Keys.LeftSuper] || this[Keys.RightSuper],
+                Mods.CapsLock => throw new NotSupportedException(),
+                Mods.NumLock => throw new NotSupportedException(),
+                _ => false
+            };
+        }
+
         private void SetProps(WindowInitProperties props)
         {
             _focused = props.Focused;
