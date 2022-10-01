@@ -21,6 +21,17 @@ namespace Zene.Windowing
 
         }
         public Window(int width, int height, string title, double version, WindowInitProperties properties = null)
+            : this(width, height, title, version, false, properties)
+        {
+            
+        }
+
+        protected Window(int width, int height, string title, bool multithreading, WindowInitProperties properties = null)
+            : this(width, height, title, 4.5, multithreading, properties)
+        {
+
+        }
+        protected Window(int width, int height, string title, double version, bool multithreading, WindowInitProperties properties = null)
         {
             //GLFW.WindowHint(GLFW.GLFW_DOUBLEBUFFER, GLFW.GLFW_FALSE);
             GLFW.WindowHint(GLFW.ClientApi, GLFW.OpenglApi);
@@ -91,6 +102,8 @@ namespace Zene.Windowing
             Core.SetupErrorHandle();
 
             _title = title;
+
+            SupportsMultithreading = multithreading;
         }
 
         private readonly GL.DebugProc OnDebugCallBack;
@@ -341,7 +354,7 @@ namespace Zene.Windowing
 
         protected ActionManager Actions { get; } = new ActionManager();
 
-        public bool SupportsAsync { get; protected set; } = false;
+        public bool SupportsMultithreading { get; }
 
         public void Run()
         {
@@ -361,9 +374,9 @@ namespace Zene.Windowing
 
             OnStop(new EventArgs());
         }
-        public void RunAsync()
+        public void RunMultithread()
         {
-            if (!SupportsAsync)
+            if (!SupportsMultithreading)
             {
                 throw new Exception("Window does not support asynchronous window management.");
             }
