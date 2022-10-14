@@ -341,6 +341,12 @@ namespace Zene.Windowing
             set => _timeOffset = GLFW.GetTime() - value;
         }
 
+        public string ClipBoard
+        {
+            set => GLFW.SetClipboardString(_window, value);
+            get => Marshal.PtrToStringUTF8(GLFW.GetClipboardString(_window));
+        }
+
         /// <summary>
         /// Determines whether <paramref name="key"/> is currently being pressed.
         /// </summary>
