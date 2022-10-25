@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -21,20 +21,28 @@
 
   <ItemGroup>
     <None Update="glfw\os64\libglfw.dylib">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="glfw\os64\libglfw.so">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="glfw\os64\libglfw.so.3">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="glfw\os64\libglfw.so.3.4">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="glfw\win64\glfw3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(OS)'=='Windows_NT'">
+	<DefineConstants>WINDOWS</DefineConstants>
+  </PropertyGroup>
+	
+  <PropertyGroup Condition="'$(OS)'=='Unix'">
+	<DefineConstants>UNIX</DefineConstants>
+  </PropertyGroup>
 
 </Project>
