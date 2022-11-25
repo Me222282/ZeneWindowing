@@ -33,7 +33,6 @@ namespace Zene.Windowing
         }
         protected Window(int width, int height, string title, double version, bool multithreading, WindowInitProperties properties = null)
         {
-            //GLFW.WindowHint(GLFW.GLFW_DOUBLEBUFFER, GLFW.GLFW_FALSE);
             GLFW.WindowHint(GLFW.ClientApi, GLFW.OpenglApi);
             if (version < 3.2)
             {
@@ -165,7 +164,6 @@ namespace Zene.Windowing
             if (dispose)
             {
                 GLFW.DestroyWindow(_window);
-                //GLFW.Terminate();
             }
         }
 
@@ -396,6 +394,8 @@ namespace Zene.Windowing
 
         public void Run()
         {
+            OnSizePixelChange(new SizeChangeEventArgs(Size));
+
             GLFW.SwapInterval(-1);
 
             OnStart(new EventArgs());
