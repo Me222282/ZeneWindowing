@@ -392,11 +392,15 @@ namespace Zene.Windowing
 
         public bool SupportsMultithreading { get; }
 
+        public bool Running { get; private set; } = false;
+
         public void Run()
         {
             OnSizePixelChange(new SizeChangeEventArgs(Size));
 
             GLFW.SwapInterval(-1);
+
+            Running = true;
 
             OnStart(new EventArgs());
 
@@ -409,6 +413,8 @@ namespace Zene.Windowing
                 GLFW.SwapBuffers(_window);
                 GLFW.PollEvents();
             }
+
+            Running = false;
 
             OnStop(new EventArgs());
         }
