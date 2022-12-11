@@ -345,6 +345,8 @@ namespace Zene.Windowing
             get => Marshal.PtrToStringUTF8(GLFW.GetClipboardString(_window));
         }
 
+        public MouseButton MouseButton { get; private set; }
+
         /// <summary>
         /// Determines whether <paramref name="key"/> is currently being pressed.
         /// </summary>
@@ -375,6 +377,23 @@ namespace Zene.Windowing
                 Mods.NumLock => throw new NotSupportedException(),
                 _ => false
             };
+        }
+        /// <summary>
+        /// Determines whether <paramref name="button"/> is currently pressed.
+        /// </summary>
+        /// <param name="button">The mouse button to query.</param>
+        /// <returns></returns>
+        public bool this[MouseButton button]
+        {
+            get
+            {
+                if (button == MouseButton.None)
+                {
+                    return MouseButton == MouseButton.None;
+                }
+
+                return (MouseButton & button) == button;
+            }
         }
 
         private void SetProps(WindowInitProperties props)
@@ -562,15 +581,24 @@ namespace Zene.Windowing
                 OnMouseLeave(new EventArgs());
             }
         }
+        private static MouseButton IntToMB(int button) => (MouseButton)Math.Pow(2, button);
         private void MouseButon(int button, int action, int mods)
         {
+            MouseButton mb = IntToMB(button);
+
             if (action == GLFW.Press)
             {
-                OnMouseDown(new MouseEventArgs(MouseLocation, (MouseButton)button, (Mods)mods));
+                // Add button
+                MouseButton |= mb;
+
+                OnMouseDown(new MouseEventArgs(MouseLocation, mb, (Mods)mods));
             }
             else
             {
-                OnMouseUp(new MouseEventArgs(MouseLocation, (MouseButton)button, (Mods)mods));
+                // remove button
+                MouseButton ^= mb;
+
+                OnMouseUp(new MouseEventArgs(MouseLocation, mb, (Mods)mods));
             }
         }
 

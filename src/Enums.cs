@@ -146,19 +146,19 @@ namespace Zene.Windowing
 
     public enum MouseButton
     {
-        Left = 0,
-        Right = 1,
-        Middle = 2,
-        Last = 7,
+        None = 0,
+        Left = 1,
+        Right = 2,
+        Middle = 4,
+        Last = 128,
         M1 = Left,
         M2 = Right,
         M3 = Middle,
-        M4 = 3,
-        M5 = 4,
-        M6 = 5,
-        M7 = 6,
-        M8 = Last,
-        None = 8
+        M4 = 8,
+        M5 = 16,
+        M6 = 32,
+        M7 = 64,
+        M8 = Last
     }
 
     public enum CursorMode
