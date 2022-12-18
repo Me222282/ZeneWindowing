@@ -441,7 +441,7 @@ namespace Zene.Windowing
         {
             if (!SupportsMultithreading)
             {
-                throw new Exception("Window does not support asynchronous window management.");
+                throw new Exception("Window does not support synchronous window management.");
             }
 
             Thread thread = new Thread(() =>
