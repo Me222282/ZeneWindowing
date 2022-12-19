@@ -94,7 +94,7 @@ namespace Zene.Windowing
             {
                 OnDebugCallBack = (source, type, _, _, _, message, _) => GLError(type, message);
 
-                GL.Enable(GLEnum.DebugOutput);
+                State.OutputDebug = true;
                 GL.DebugMessageCallback(OnDebugCallBack, null);
             }
 
