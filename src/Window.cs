@@ -415,6 +415,7 @@ namespace Zene.Windowing
 
         public void Run()
         {
+            OnSizeChange(new SizeChangeEventArgs(Size));
             OnSizePixelChange(new SizeChangeEventArgs(Size));
 
             GLFW.SwapInterval(-1);
