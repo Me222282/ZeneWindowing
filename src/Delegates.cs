@@ -10,9 +10,9 @@
 
     public delegate void MouseEventHandler(object sender, MouseEventArgs e);
 
-    public delegate void SizeChangeEventHandler(object sender, SizeChangeEventArgs e);
+    public delegate void VectorIEventHandler(object sender, VectorIEventArgs e);
+
+    public delegate void VectorEventHandler(object sender, VectorEventArgs e);
 
     public delegate void FocusedEventHandler(object sender, FocusedEventArgs e);
-
-    public delegate void PositionEventHandler(object sender, PositionEventArgs e);
 }

@@ -415,8 +415,8 @@ namespace Zene.Windowing
 
         public void Run()
         {
-            OnSizeChange(new SizeChangeEventArgs(Size));
-            OnSizePixelChange(new SizeChangeEventArgs(Size));
+            OnSizeChange(new VectorIEventArgs(Size));
+            OnSizePixelChange(new VectorIEventArgs(Size));
 
             GLFW.SwapInterval(-1);
 
@@ -503,13 +503,13 @@ namespace Zene.Windowing
         public event MouseEventHandler MouseMove;
         public event MouseEventHandler MouseDown;
         public event MouseEventHandler MouseUp;
-        public event SizeChangeEventHandler SizeChange;
+        public event VectorIEventHandler SizeChange;
         public event EventHandler Maximized;
         public event FocusedEventHandler Focus;
         public event EventHandler Refresh;
         public event EventHandler Closing;
-        public event PositionEventHandler WindowMove;
-        public event SizeChangeEventHandler SizePixelChange;
+        public event VectorIEventHandler WindowMove;
+        public event VectorIEventHandler SizePixelChange;
 
         public event EventHandler Update;
         public event EventHandler Start;
@@ -524,13 +524,13 @@ namespace Zene.Windowing
             _onCursorEnterCallBack = (_, enter) => MouseOver(enter == 1);
             _onMouseMoveCalBack = (_, x, y) => OnMouseMove(new MouseEventArgs(x, y));
             _onMouseButtonCallBack = (_, button, action, mod) => MouseButon(button, action, mod);
-            _onSizeCallBack = (_, width, height) => OnSizeChange(new SizeChangeEventArgs(width, height));
+            _onSizeCallBack = (_, width, height) => OnSizeChange(new VectorIEventArgs(width, height));
             _onMaximizedCallBack = (_, i) => OnMaximized(new EventArgs());
             _onFocusCallBack = (_, focus) => OnFocus(new FocusedEventArgs(focus == 1));
             _onRefreshCallBack = (_) => OnRefresh(new EventArgs());
             _onCloseCallBack = (_) => OnClosing(new EventArgs());
-            _onWindowMoveCallBack = (_, x, y) => OnWindowMove(new PositionEventArgs(x, y));
-            _onFrameBufferCallBack = (_, width, height) => OnSizePixelChange(new SizeChangeEventArgs(width, height));
+            _onWindowMoveCallBack = (_, x, y) => OnWindowMove(new VectorIEventArgs(x, y));
+            _onFrameBufferCallBack = (_, width, height) => OnSizePixelChange(new VectorIEventArgs(width, height));
 
             GLFW.SetDropCallback(_window, _onFileDropCallBack);
             GLFW.SetCharCallback(_window, _onTextInput);
@@ -647,7 +647,7 @@ namespace Zene.Windowing
         {
             MouseUp?.Invoke(this, e);
         }
-        protected virtual void OnSizeChange(SizeChangeEventArgs e)
+        protected virtual void OnSizeChange(VectorIEventArgs e)
         {
             SizeChange?.Invoke(this, e);
         }
@@ -672,25 +672,25 @@ namespace Zene.Windowing
         {
             Closing?.Invoke(this, e);
         }
-        protected virtual void OnWindowMove(PositionEventArgs e)
+        protected virtual void OnWindowMove(VectorIEventArgs e)
         {
             lock (_posRef)
             {
-                _pos = e.Location;
+                _pos = e.Value;
             }
             WindowMove?.Invoke(this, e);
         }
-        protected virtual void OnSizePixelChange(SizeChangeEventArgs e)
+        protected virtual void OnSizePixelChange(VectorIEventArgs e)
         {
             lock (_sizeRef)
             {
-                _size = e.Size;
+                _size = e.Value;
             }
 
             Actions.Push(() =>
             {
-                _baseFramebuffer.Size(e.Width, e.Height);
-                BaseFramebuffer.ViewSize = e.Size;
+                _baseFramebuffer.Size(e.X, e.Y);
+                BaseFramebuffer.ViewSize = e.Value;
             });
 
             SizePixelChange?.Invoke(this, e);

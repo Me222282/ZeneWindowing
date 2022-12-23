@@ -2774,6 +2774,7 @@ namespace Zene.Windowing.Base
 			}
 
 			State.CurrentContext = window.GraphicsContext;
+			window.GraphicsContext?.ThreadChange();
 			_glfwMakeContextCurrent(window.Handle);
 		}
 
