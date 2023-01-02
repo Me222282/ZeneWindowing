@@ -15,4 +15,6 @@
     public delegate void VectorEventHandler(object sender, VectorEventArgs e);
 
     public delegate void FocusedEventHandler(object sender, FocusedEventArgs e);
+
+    public delegate void FrameEventHandler(object sender, FrameEventArgs e);
 }

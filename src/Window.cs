@@ -88,6 +88,8 @@ namespace Zene.Windowing
             // Set framebuffer reference size
             _baseFramebuffer.Size(width, height);
 
+            DrawManager = new DrawManager();
+
             // Setup debug callback - error output/display
             // If supported in current opengl version
             if (((Action<GL.DebugProc, IntPtr>)GL.DebugMessageCallback).IsSupported())
@@ -407,6 +409,8 @@ namespace Zene.Windowing
             _mousePos = new Vector2(mx, my);
         }
 
+        public DrawManager DrawManager { get; }
+
         protected ActionManager Actions => GraphicsContext.Actions;
 
         public bool SupportsMultithreading { get; }
@@ -428,7 +432,9 @@ namespace Zene.Windowing
             {
                 GraphicsContext.Actions.Flush();
 
-                OnUpdate(new EventArgs());
+                DrawManager.Framebuffer = Framebuffer;
+
+                OnUpdate(new FrameEventArgs(DrawManager));
 
                 GLFW.SwapBuffers(_window);
                 GLFW.PollEvents();
@@ -457,7 +463,7 @@ namespace Zene.Windowing
                 {
                     Actions.Flush();
 
-                    OnUpdate(new EventArgs());
+                    OnUpdate(new FrameEventArgs(DrawManager));
 
                     GLFW.SwapBuffers(_window);
                 }
@@ -511,7 +517,7 @@ namespace Zene.Windowing
         public event VectorIEventHandler WindowMove;
         public event VectorIEventHandler SizePixelChange;
 
-        public event EventHandler Update;
+        public event FrameEventHandler Update;
         public event EventHandler Start;
         public event EventHandler Stop;
 
@@ -696,7 +702,7 @@ namespace Zene.Windowing
             SizePixelChange?.Invoke(this, e);
         }
 
-        protected virtual void OnUpdate(EventArgs e)
+        protected virtual void OnUpdate(FrameEventArgs e)
         {
             Update?.Invoke(this, e);
         }
