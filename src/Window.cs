@@ -275,6 +275,9 @@ namespace Zene.Windowing
             get => _mousePos;
             set
             {
+                // Invert Y
+                value.Y = _size.Y - value.Y;
+
                 GLFW.SetCursorPos(_window, value.X, value.Y);
                 lock (_mousePosRef)
                 {
@@ -406,6 +409,8 @@ namespace Zene.Windowing
             _pos = new Vector2I(x, y);
 
             GLFW.GetCursorPos(_window, out double mx, out double my);
+            // Invert Y
+            my = _size.Y - my;
             _mousePos = new Vector2(mx, my);
         }
 
@@ -528,7 +533,7 @@ namespace Zene.Windowing
             _onKeyCallBack = (_, key, dumy, action, mods) => KeyCallBack(key, action, mods);
             _onScrollCallBack = (_, x, y) => OnScroll(new ScrollEventArgs(x, y));
             _onCursorEnterCallBack = (_, enter) => MouseOver(enter == 1);
-            _onMouseMoveCalBack = (_, x, y) => OnMouseMove(new MouseEventArgs(x, y));
+            _onMouseMoveCalBack = (_, x, y) => OnMouseMove(new MouseEventArgs(x, _size.Y - y));
             _onMouseButtonCallBack = (_, button, action, mod) => MouseButon(button, action, mod);
             _onSizeCallBack = (_, width, height) => OnSizeChange(new VectorIEventArgs(width, height));
             _onMaximizedCallBack = (_, i) => OnMaximized(new EventArgs());
@@ -598,14 +603,14 @@ namespace Zene.Windowing
                 // Add button
                 MouseButton |= mb;
 
-                OnMouseDown(new MouseEventArgs(MouseLocation, mb, (Mods)mods));
+                OnMouseDown(new MouseEventArgs(_mousePos, mb, (Mods)mods));
             }
             else
             {
                 // remove button
                 MouseButton ^= mb;
 
-                OnMouseUp(new MouseEventArgs(MouseLocation, mb, (Mods)mods));
+                OnMouseUp(new MouseEventArgs(_mousePos, mb, (Mods)mods));
             }
         }
 
