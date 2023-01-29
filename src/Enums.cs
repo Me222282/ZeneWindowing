@@ -1,4 +1,5 @@
-﻿using Zene.Windowing.Base;
+﻿using System;
+using Zene.Windowing.Base;
 
 namespace Zene.Windowing
 {
@@ -127,6 +128,7 @@ namespace Zene.Windowing
         Hashtag = 35
     }
 
+    [Flags]
     public enum Mods
     {
         NumLock = GLFW.ModNumLock,
@@ -144,6 +146,7 @@ namespace Zene.Windowing
         Up = GLFW.Release
     }
 
+    [Flags]
     public enum MouseButton
     {
         None = 0,
