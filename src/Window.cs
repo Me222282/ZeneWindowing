@@ -460,6 +460,9 @@ namespace Zene.Windowing
             {
                 IsContext = true;
 
+                OnSizeChange(new VectorIEventArgs(Size));
+                OnSizePixelChange(new VectorIEventArgs(Size));
+
                 GLFW.SwapInterval(-1);
 
                 OnStart(new EventArgs());
