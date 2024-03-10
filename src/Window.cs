@@ -701,11 +701,14 @@ namespace Zene.Windowing
                 _size = e.Value;
             }
 
-            Actions.Push(() =>
+            if (e.X > 0 && e.Y > 0)
             {
-                _baseFramebuffer.Size(e.X, e.Y);
-                BaseFramebuffer.ViewSize = e.Value;
-            });
+                Actions.Push(() =>
+                {
+                    _baseFramebuffer.Size(e.X, e.Y);
+                    BaseFramebuffer.ViewSize = e.Value;
+                });
+            }
 
             SizePixelChange?.Invoke(this, e);
         }
