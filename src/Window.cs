@@ -88,7 +88,7 @@ namespace Zene.Windowing
             // Set framebuffer reference size
             _baseFramebuffer.Size(width, height);
 
-            DrawManager = new DrawManager();
+            DrawContext = new DrawContext();
 
             // Setup debug callback - error output/display
             // If supported in current opengl version
@@ -414,7 +414,7 @@ namespace Zene.Windowing
             _mousePos = new Vector2(mx, my);
         }
 
-        public DrawManager DrawManager { get; }
+        public DrawContext DrawContext { get; }
 
         protected ActionManager Actions => GraphicsContext.Actions;
 
@@ -437,9 +437,13 @@ namespace Zene.Windowing
             {
                 GraphicsContext.Actions.Flush();
 
-                DrawManager.Framebuffer = Framebuffer;
+                DrawContext.Framebuffer = Framebuffer;
+                OnUpdate(new FrameEventArgs(DrawContext));
 
-                OnUpdate(new FrameEventArgs(DrawManager));
+                if (Framebuffer != _baseFramebuffer)
+                {
+                    _baseFramebuffer.Write(Framebuffer, BufferBit.Colour, TextureSampling.Nearest);
+                }
 
                 GLFW.SwapBuffers(_window);
                 GLFW.PollEvents();
@@ -471,7 +475,7 @@ namespace Zene.Windowing
                 {
                     Actions.Flush();
 
-                    OnUpdate(new FrameEventArgs(DrawManager));
+                    OnUpdate(new FrameEventArgs(DrawContext));
 
                     GLFW.SwapBuffers(_window);
                 }
