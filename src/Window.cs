@@ -88,7 +88,11 @@ namespace Zene.Windowing
             // Set framebuffer reference size
             _baseFramebuffer.Size(width, height);
 
-            DrawContext = new DrawContext();
+            DrawContext = new DrawContext()
+            {
+                DepthState = DepthState.Default,
+                RenderState = RenderState.Default
+            };
 
             // Setup debug callback - error output/display
             // If supported in current opengl version
