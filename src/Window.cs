@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Zene.Graphics;
@@ -93,6 +94,7 @@ namespace Zene.Windowing
                 DepthState = DepthState.Default,
                 RenderState = RenderState.Default
             };
+            _windowSizeFollowers = new List<ISizeable>(8);
 
             // Setup debug callback - error output/display
             // If supported in current opengl version
@@ -426,6 +428,22 @@ namespace Zene.Windowing
 
         public bool Running { get; private set; } = false;
 
+        private double RunFunc(double t)
+        {
+            GraphicsContext.Actions.Flush();
+
+            DrawContext.Framebuffer = Framebuffer;
+            double nt = GLFW.GetTime();
+            OnUpdate(new FrameEventArgs(DrawContext, nt - t));
+
+            if (Framebuffer != _baseFramebuffer)
+            {
+                _baseFramebuffer.Write(Framebuffer, BufferBit.Colour, TextureSampling.Nearest);
+            }
+
+            GLFW.SwapBuffers(_window);
+            return nt;
+        }
         public void Run()
         {
             OnSizeChange(new VectorIEventArgs(Size));
@@ -437,19 +455,10 @@ namespace Zene.Windowing
 
             OnStart(new EventArgs());
 
+            double t = GLFW.GetTime();
             while (GLFW.WindowShouldClose(_window) == GLFW.False)
             {
-                GraphicsContext.Actions.Flush();
-
-                DrawContext.Framebuffer = Framebuffer;
-                OnUpdate(new FrameEventArgs(DrawContext));
-
-                if (Framebuffer != _baseFramebuffer)
-                {
-                    _baseFramebuffer.Write(Framebuffer, BufferBit.Colour, TextureSampling.Nearest);
-                }
-
-                GLFW.SwapBuffers(_window);
+                t = RunFunc(t);
                 GLFW.PollEvents();
             }
 
@@ -475,13 +484,10 @@ namespace Zene.Windowing
 
                 OnStart(new EventArgs());
 
+                double t = GLFW.GetTime();
                 while (GLFW.WindowShouldClose(_window) == GLFW.False)
                 {
-                    Actions.Flush();
-
-                    OnUpdate(new FrameEventArgs(DrawContext));
-
-                    GLFW.SwapBuffers(_window);
+                    t = RunFunc(t);
                 }
 
                 OnStop(new EventArgs());
@@ -498,6 +504,27 @@ namespace Zene.Windowing
             {
                 GLFW.WaitEvents();
             }
+        }
+
+        private readonly List<ISizeable> _windowSizeFollowers;
+        /// <summary>
+        /// Adds an object which is to be set to the window size.
+        /// </summary>
+        /// <param name="sizeable">The object to follow the window size.</param>
+        public void AddWindowFollower(ISizeable sizeable)
+        {
+            if (sizeable is null) { return; }
+            _windowSizeFollowers.Add(sizeable);
+        }
+        /// <summary>
+        /// Removes an object which was in the window size following list.
+        /// </summary>
+        /// <param name="sizeable">The object that followed the window size.</param>
+        /// <returns>True if the remove was successful, otherwise false.</returns>
+        public bool RemoveWindowFollower(ISizeable sizeable)
+        {
+            if (sizeable is null) { return false; }
+            return _windowSizeFollowers.Remove(sizeable);
         }
 
         private GLFW.FileDropHandler _onFileDropCallBack;
@@ -715,6 +742,13 @@ namespace Zene.Windowing
                 {
                     _baseFramebuffer.Size(e.X, e.Y);
                     BaseFramebuffer.ViewSize = e.Value;
+
+                    // Faster method of iteration
+                    ReadOnlySpan<ISizeable> span = CollectionsMarshal.AsSpan(_windowSizeFollowers);
+                    for (int i = 0; i < span.Length; i++)
+                    {
+                        span[i].Size = _size;
+                    }
                 });
             }
 
@@ -769,9 +803,6 @@ namespace Zene.Windowing
         /// </summary>
         /// <param name="handle">The GLFW pointer to a window object.</param>
         /// <returns></returns>
-        public static Window FromHandle(IntPtr handle)
-        {
-            return new Window(handle);
-        }
+        public static Window FromHandle(IntPtr handle) => new Window(handle);
     }
 }
