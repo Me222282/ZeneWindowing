@@ -85,6 +85,9 @@ namespace Zene.Windowing
                 properties.DoubleBuffered,
                 width, height, version);
             State.CurrentContext = GraphicsContext;
+            // Helper constants
+            // Only works with 1 context in use at a time
+            Shapes.Init();
 
             // Set framebuffer reference size
             _baseFramebuffer.Size(width, height);
