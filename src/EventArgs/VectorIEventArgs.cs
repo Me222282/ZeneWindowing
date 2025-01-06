@@ -3,22 +3,22 @@ using Zene.Structs;
 
 namespace Zene.Windowing
 {
-    public class VectorEventArgs : EventArgs
+    public class VectorIEventArgs : EventArgs
     {
-        public VectorEventArgs(double x, double y)
+        public VectorIEventArgs(int x, int y)
         {
-            Value = new Vector2(x, y);
+            Value = new Vector2I(x, y);
         }
 
-        public VectorEventArgs(Vector2 vector)
+        public VectorIEventArgs(Vector2I vector)
         {
             Value = vector;
         }
 
-        public double X => Value.X;
-        public double Y => Value.Y;
-        public Vector2 Value { get; }
+        public int X => Value.X;
+        public int Y => Value.Y;
+        public Vector2I Value { get; }
 
-        public static explicit operator VectorIEventArgs(VectorEventArgs vie) => new VectorIEventArgs((Vector2I)vie.Value);
+        public static explicit operator VectorEventArgs(VectorIEventArgs vie) => new VectorEventArgs(vie.Value);
     }
 }

@@ -17,22 +17,22 @@ namespace Zene.Windowing
         }
 
         public Window(int width, int height, string title, WindowInitProperties properties = null)
-            : this(width, height, title, 4.5, properties)
+            : this(width, height, title, 4.5f, properties)
         {
 
         }
-        public Window(int width, int height, string title, double version, WindowInitProperties properties = null)
+        public Window(int width, int height, string title, floatv version, WindowInitProperties properties = null)
             : this(width, height, title, version, false, properties)
         {
             
         }
 
         protected Window(int width, int height, string title, bool multithreading, WindowInitProperties properties = null)
-            : this(width, height, title, 4.5, multithreading, properties)
+            : this(width, height, title, 4.5f, multithreading, properties)
         {
 
         }
-        protected Window(int width, int height, string title, double version, bool multithreading, WindowInitProperties properties = null)
+        protected Window(int width, int height, string title, floatv version, bool multithreading, WindowInitProperties properties = null)
         {
             GLFW.WindowHint(GLFW.ClientApi, GLFW.OpenglApi);
             if (version < 3.2)
@@ -437,7 +437,7 @@ namespace Zene.Windowing
 
             DrawContext.Framebuffer = Framebuffer;
             double nt = GLFW.GetTime();
-            OnUpdate(new FrameEventArgs(DrawContext, nt - t));
+            OnUpdate(new FrameEventArgs(DrawContext, (floatv)(nt - t)));
 
             if (Framebuffer != _baseFramebuffer)
             {
@@ -572,9 +572,9 @@ namespace Zene.Windowing
             _onFileDropCallBack = (_, count, paths) => DropCallBack(count, paths);
             _onTextInput = (_, unicode) => OnTextInput(new TextInputEventArgs((char)unicode));
             _onKeyCallBack = (_, key, dumy, action, mods) => KeyCallBack(key, action, mods);
-            _onScrollCallBack = (_, x, y) => OnScroll(new ScrollEventArgs(x, y));
+            _onScrollCallBack = (_, x, y) => OnScroll(new ScrollEventArgs((floatv)x, (floatv)y));
             _onCursorEnterCallBack = (_, enter) => MouseOver(enter == 1);
-            _onMouseMoveCalBack = (_, x, y) => OnMouseMove(new MouseEventArgs(x, _size.Y - y));
+            _onMouseMoveCalBack = (_, x, y) => OnMouseMove(new MouseEventArgs((floatv)x, (floatv)(_size.Y - y)));
             _onMouseButtonCallBack = (_, button, action, mod) => MouseButon(button, action, mod);
             _onSizeCallBack = (_, width, height) => OnSizeChange(new VectorIEventArgs(width, height));
             _onMaximizedCallBack = (_, i) => OnMaximized(new EventArgs());

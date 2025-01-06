@@ -26,7 +26,7 @@ namespace Zene.Windowing
             Modifier = 0;
         }
 
-        public MouseEventArgs(double x, double y)
+        public MouseEventArgs(floatv x, floatv y)
         {
             Location = new Vector2(x, y);
             Button = MouseButton.None;
@@ -37,8 +37,8 @@ namespace Zene.Windowing
 
         public Vector2 Location { get; }
 
-        public double X => Location.X;
-        public double Y => Location.Y;
+        public floatv X => Location.X;
+        public floatv Y => Location.Y;
 
         public Mods Modifier { get; }
     }
