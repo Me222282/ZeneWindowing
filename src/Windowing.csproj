@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Zene.Windowing</RootNamespace>
-	<Configurations>Debug;Release;Debug64;Release64</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,27 +14,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug64|AnyCPU'">
-	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<NoWarn>1701;1702;IDE0090</NoWarn>
-	<DefineConstants>$(DefineConstants);DEBUG;DOUBLE</DefineConstants>
-	<Optimize>false</Optimize>
-	<DebugType>full</DebugType>
-	<ErrorReport>prompt</ErrorReport>
-	<DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release64|AnyCPU'">
-	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<DefineConstants>$(DefineConstants);RELEASE;DOUBLE</DefineConstants>
-	<DebugType>portable</DebugType>
-	<Optimize>true</Optimize>
-	<DebugSymbols>false</DebugSymbols>
+  <PropertyGroup Condition="'$(UseDouble)'=='true'">
+	<DefineConstants>$(DefineConstants);DOUBLE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Graphics\src\Graphics.csproj" />
-    <ProjectReference Include="..\..\Structs\src\Structs.csproj" />
+    <ProjectReference Include="..\..\Graphics\src\Graphics.csproj" AdditionalProperties="UseDouble=$(UseDouble)" />
+    <ProjectReference Include="..\..\Structs\src\Structs.csproj" AdditionalProperties="UseDouble=$(UseDouble)" />
   </ItemGroup>
 
   <ItemGroup>
