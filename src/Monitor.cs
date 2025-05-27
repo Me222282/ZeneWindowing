@@ -174,8 +174,7 @@ namespace Zene.Windowing
 
         public override bool Equals(object obj)
         {
-            return obj is Monitor m &&
-                _monitor == m._monitor;
+            return obj is Monitor m && this == m;
         }
 
         /// <summary>
@@ -184,20 +183,14 @@ namespace Zene.Windowing
         /// <param name="l"></param>
         /// <param name="r"></param>
         /// <returns></returns>
-        public static bool operator ==(Monitor l, Monitor r)
-        {
-            return l.Equals(r);
-        }
+        public static bool operator ==(Monitor l, Monitor r) => l._monitor == r._monitor;
         /// <summary>
         /// Determines whether two <see cref="Monitor"/> instances are pointing to different monitors.
         /// </summary>
         /// <param name="l"></param>
         /// <param name="r"></param>
         /// <returns></returns>
-        public static bool operator !=(Monitor l, Monitor r)
-        {
-            return !l.Equals(r);
-        }
+        public static bool operator !=(Monitor l, Monitor r) => !(l == r);
 
         /// <summary>
         /// Gets the primary monitor for the current context.

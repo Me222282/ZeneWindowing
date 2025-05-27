@@ -773,8 +773,7 @@ namespace Zene.Windowing
 
         public override bool Equals(object obj)
         {
-            return obj is Window window &&
-                   _window == window._window;
+            return obj is Window window && this == window;
         }
         public override int GetHashCode() => HashCode.Combine(_window);
 
@@ -785,17 +784,9 @@ namespace Zene.Windowing
                 return r is null;
             }
 
-            return l.Equals(r);
+            return l._window == r._window;
         }
-        public static bool operator !=(Window l, Window r)
-        {
-            if (l is null)
-            {
-                return !(r is null);
-            }
-
-            return !l.Equals(r);
-        }
+        public static bool operator !=(Window l, Window r) => !(l == r);
 
         /// <summary>
         /// A null value window.
