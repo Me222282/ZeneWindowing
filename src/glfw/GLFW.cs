@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 using Zene.Graphics;
@@ -310,7 +311,9 @@ namespace Zene.Windowing.Base
 		}
 
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
-		public delegate void ErrorHandler(int error, string description);
+		public delegate void ErrorHandler(int error,
+			[MarshalAs(UnmanagedType.LPUTF8Str)]
+			string description);
 
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
 		public delegate void WindowPosHandler(IntPtr window, int xpos, int ypos);
@@ -382,8 +385,9 @@ namespace Zene.Windowing.Base
 		/// `GLFW_TRUE` if successful, or `GLFW_FALSE` if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwInit", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int Init();
+		[LibraryImport(LinkLibrary, EntryPoint = "glfwInit")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial int Init();
 
 		/// <summary>
 		/// Terminates the GLFW library.
@@ -394,8 +398,9 @@ namespace Zene.Windowing.Base
 		/// function is called, you must again call @ref Init successfully before
 		/// you will be able to use most GLFW functions.
 		/// </remarks>
-		[DllImport(LinkLibrary, EntryPoint = "glfwTerminate", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void Terminate();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwTerminate")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial void Terminate();
 
 		/// <summary>
 		/// Sets the specified init hint to the desired value.
@@ -409,8 +414,9 @@ namespace Zene.Windowing.Base
 		/// <param name="value">
 		/// The new value of the init hint.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwglfwInitHint", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void InitHint(int hint, int value);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwInitHint")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial void InitHint(int hint, int value);
 
 		/// <summary>
 		/// Retrieves the version of the GLFW library.
@@ -429,11 +435,26 @@ namespace Zene.Windowing.Base
 		/// <param name="rev">
 		/// Where to store the revision number, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetVersion", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetVersion(out int major, out int minor, out int rev);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetVersion")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial void GetVersion(out int major, out int minor, out int rev);
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetVersionString", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr _glfwGetVersionString();
+        /// <summary>
+        /// Returns a string describing the compile-time configuration.
+        /// </summary>
+        /// <remarks>
+        /// This function returns the compile-time generated
+        /// [version string](@ref intro_version_string) of the GLFW library binary.  It
+        /// describes the version, platform, compiler and any platform-specific
+        /// compile-time options.  It should not be confused with the OpenGL or OpenGL
+        /// ES version string, queried with `glGetString`.
+        /// </remarks>
+        /// <returns>
+        /// The ASCII encoded GLFW version string.
+        /// </returns>
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetVersionString", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+        public static partial string GetVersionString();
 
 		/// <summary>
 		/// Returns and clears the last error for the calling thread.
@@ -452,8 +473,9 @@ namespace Zene.Windowing.Base
 		/// The last error code for the calling thread, or @ref GLFW_NO_ERROR
 		/// (zero).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetError", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetError(IntPtr description);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetError")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int GetError(IntPtr description);
 
 		/// <summary>
 		/// Sets the error callback.
@@ -469,11 +491,13 @@ namespace Zene.Windowing.Base
 		/// <returns>
 		/// The previously set callback, or `NULL` if no callback was set.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetErrorCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern ErrorHandler SetErrorCallback(ErrorHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetErrorCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial ErrorHandler SetErrorCallback(ErrorHandler cbfun);
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetMonitors", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr _glfwGetMonitors(out int count);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetMonitors")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial IntPtr _glfwGetMonitors(out int count);
 
 		/// <summary>
 		/// Returns the primary monitor.
@@ -486,8 +510,9 @@ namespace Zene.Windowing.Base
 		/// The primary monitor, or `NULL` if no monitors were found or if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetPrimaryMonitor", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetPrimaryMonitor();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetPrimaryMonitor")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetPrimaryMonitor();
 
 		/// <summary>
 		/// Returns the position of the monitor's viewport on the virtual screen.
@@ -505,8 +530,9 @@ namespace Zene.Windowing.Base
 		/// <param name="ypos">
 		/// Where to store the monitor y-coordinate, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetMonitorPos", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetMonitorPos(IntPtr monitor, out int xpos, out int ypos);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetMonitorPos")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetMonitorPos(IntPtr monitor, out int xpos, out int ypos);
 
 		/// <summary>
 		/// Retrives the work area of the monitor.
@@ -534,8 +560,9 @@ namespace Zene.Windowing.Base
 		/// <param name="height">
 		/// Where to store the monitor height, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetMonitorWorkarea", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetMonitorWorkarea(IntPtr monitor, out int xpos, out int ypos, out int width, out int height);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetMonitorWorkarea")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetMonitorWorkarea(IntPtr monitor, out int xpos, out int ypos, out int width, out int height);
 
 		/// <summary>
 		/// Returns the physical size of the monitor.
@@ -555,8 +582,9 @@ namespace Zene.Windowing.Base
 		/// Where to store the height, in millimetres, of the
 		/// monitor's display area, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetMonitorPhysicalSize", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetMonitorPhysicalSize(IntPtr monitor, out int widthMM, out int heightMM);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetMonitorPhysicalSize")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetMonitorPhysicalSize(IntPtr monitor, out int widthMM, out int heightMM);
 
 		/// <summary>
 		/// Retrieves the content scale for the specified monitor.
@@ -579,8 +607,9 @@ namespace Zene.Windowing.Base
 		/// <param name="yscale">
 		/// Where to store the y-axis content scale, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetMonitorContentScale", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetMonitorContentScale(IntPtr monitor, out IntPtr xscale, out IntPtr yscale);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetMonitorContentScale")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetMonitorContentScale(IntPtr monitor, out IntPtr xscale, out IntPtr yscale);
 
 		/// <summary>
 		/// Returns the name of the specified monitor.
@@ -597,8 +626,9 @@ namespace Zene.Windowing.Base
 		/// The UTF-8 encoded name of the monitor, or `NULL` if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetMonitorName", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetMonitorName(IntPtr monitor);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetMonitorName")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetMonitorName(IntPtr monitor);
 
 		/// <summary>
 		/// Sets the user pointer of the specified monitor.
@@ -614,8 +644,9 @@ namespace Zene.Windowing.Base
 		/// <param name="pointer">
 		/// The new value.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetMonitorUserPointer", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetMonitorUserPointer(IntPtr monitor, IntPtr pointer);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetMonitorUserPointer")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetMonitorUserPointer(IntPtr monitor, IntPtr pointer);
 
 		/// <summary>
 		/// Returns the user pointer of the specified monitor.
@@ -627,8 +658,9 @@ namespace Zene.Windowing.Base
 		/// <param name="monitor">
 		/// The monitor whose pointer to return.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetMonitorUserPointer", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetMonitorUserPointer(IntPtr monitor);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetMonitorUserPointer")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetMonitorUserPointer(IntPtr monitor);
 
 		/// <summary>
 		/// Sets the monitor configuration callback.
@@ -646,8 +678,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetMonitorCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern MonitorHandler SetMonitorCallback(MonitorHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetMonitorCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial MonitorHandler SetMonitorCallback(MonitorHandler cbfun);
 
 		/// <summary>
 		/// Returns the available video modes for the specified monitor.
@@ -669,11 +702,13 @@ namespace Zene.Windowing.Base
 		/// An array of video modes, or `NULL` if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetVideoModes", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetVideoModes(IntPtr monitor, out int count);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetVideoModes")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetVideoModes(IntPtr monitor, out int count);
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetVideoMode", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr _glfwGetVideoMode(IntPtr monitor);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetVideoMode")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial IntPtr _glfwGetVideoMode(IntPtr monitor);
 
 		/// <summary>
 		/// Generates a gamma ramp and sets it for the specified monitor.
@@ -689,11 +724,13 @@ namespace Zene.Windowing.Base
 		/// <param name="gamma">
 		/// The desired exponent.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetGamma", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetGamma(IntPtr monitor, float gamma);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetGamma")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetGamma(IntPtr monitor, float gamma);
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetGammaRamp", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr _glfwGetGammaRamp(IntPtr monitor);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetGammaRamp")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial IntPtr _glfwGetGammaRamp(IntPtr monitor);
 
 		/// <summary>
 		/// Sets the current gamma ramp for the specified monitor.
@@ -709,8 +746,9 @@ namespace Zene.Windowing.Base
 		/// <param name="ramp">
 		/// The gamma ramp to use.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetGammaRamp", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetGammaRamp(IntPtr monitor, IntPtr ramp);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetGammaRamp")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetGammaRamp(IntPtr monitor, IntPtr ramp);
 
 		/// <summary>
 		/// Resets all window hints to their default values.
@@ -719,8 +757,9 @@ namespace Zene.Windowing.Base
 		/// This function resets all window hints to their
 		/// [default values](@ref window_hints_values).
 		/// </remarks>
-		[DllImport(LinkLibrary, EntryPoint = "glfwDefaultWindowHints", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void DefaultWindowHints();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwDefaultWindowHints")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void DefaultWindowHints();
 
 		/// <summary>
 		/// Sets the specified window hint to the desired value.
@@ -736,8 +775,9 @@ namespace Zene.Windowing.Base
 		/// <param name="value">
 		/// The new value of the window hint.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwWindowHint", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void WindowHint(int hint, int value);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwWindowHint")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void WindowHint(int hint, int value);
 
 		/// <summary>
 		/// Sets the specified window hint to the desired value.
@@ -753,14 +793,17 @@ namespace Zene.Windowing.Base
 		/// <param name="value">
 		/// The new value of the window hint.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwWindowHintString", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void WindowHintString(int hint, string value);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwWindowHintString", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void WindowHintString(int hint, string value);
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwCreateWindow", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr _glfwCreateWindow(int width, int height, string title, IntPtr monitor, IntPtr share);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwCreateWindow", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial IntPtr _glfwCreateWindow(int width, int height, string title, IntPtr monitor, IntPtr share);
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwDestroyWindow", CallingConvention = CallingConvention.Cdecl)]
-		private static extern void _glfwDestroyWindow(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwDestroyWindow")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial void _glfwDestroyWindow(IntPtr window);
 
 		/// <summary>
 		/// Checks the close flag of the specified window.
@@ -774,8 +817,9 @@ namespace Zene.Windowing.Base
 		/// <returns>
 		/// The value of the close flag.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int WindowShouldClose(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwWindowShouldClose")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int WindowShouldClose(IntPtr window);
 
 		/// <summary>
 		/// Sets the close flag of the specified window.
@@ -791,8 +835,9 @@ namespace Zene.Windowing.Base
 		/// <param name="value">
 		/// The new value.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowShouldClose(IntPtr window, int value);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowShouldClose")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowShouldClose(IntPtr window, int value);
 
 		/// <summary>
 		/// Sets the title of the specified window.
@@ -807,8 +852,9 @@ namespace Zene.Windowing.Base
 		/// <param name="title">
 		/// The UTF-8 encoded window title.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowTitle", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowTitle(IntPtr window, string title);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowTitle", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowTitle(IntPtr window, string title);
 
 		/// <summary>
 		/// Sets the icon for the specified window.
@@ -830,8 +876,9 @@ namespace Zene.Windowing.Base
 		/// The images to create the icon from.  This is ignored if
 		/// count is zero.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowIcon", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowIcon(IntPtr window, int count, IntPtr images);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowIcon")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowIcon(IntPtr window, int count, IntPtr images);
 
 		/// <summary>
 		/// Retrieves the position of the content area of the specified window.
@@ -851,8 +898,9 @@ namespace Zene.Windowing.Base
 		/// Where to store the y-coordinate of the upper-left corner of
 		/// the content area, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetWindowPos", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetWindowPos(IntPtr window, out int xpos, out int ypos);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetWindowPos")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetWindowPos(IntPtr window, out int xpos, out int ypos);
 
 		/// <summary>
 		/// Sets the position of the content area of the specified window.
@@ -871,8 +919,9 @@ namespace Zene.Windowing.Base
 		/// <param name="ypos">
 		/// The y-coordinate of the upper-left corner of the content area.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowPos", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowPos(IntPtr window, int xpos, int ypos);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowPos")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowPos(IntPtr window, int xpos, int ypos);
 
 		/// <summary>
 		/// Retrieves the size of the content area of the specified window.
@@ -893,8 +942,9 @@ namespace Zene.Windowing.Base
 		/// Where to store the height, in screen coordinates, of the
 		/// content area, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetWindowSize", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetWindowSize(IntPtr window, out int width, out int height);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetWindowSize")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetWindowSize(IntPtr window, out int width, out int height);
 
 		/// <summary>
 		/// Sets the size limits of the specified window.
@@ -924,8 +974,9 @@ namespace Zene.Windowing.Base
 		/// The maximum height, in screen coordinates, of the
 		/// content area, or `GLFW_DONT_CARE`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowSizeLimits", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowSizeLimits(IntPtr window, int minwidth, int minheight, int maxwidth, int maxheight);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowSizeLimits")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowSizeLimits(IntPtr window, int minwidth, int minheight, int maxwidth, int maxheight);
 
 		/// <summary>
 		/// Sets the aspect ratio of the specified window.
@@ -947,8 +998,9 @@ namespace Zene.Windowing.Base
 		/// The denominator of the desired aspect ratio, or
 		/// `GLFW_DONT_CARE`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowAspectRatio", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowAspectRatio(IntPtr window, int numer, int denom);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowAspectRatio")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowAspectRatio(IntPtr window, int numer, int denom);
 
 		/// <summary>
 		/// Sets the size of the content area of the specified window.
@@ -968,8 +1020,9 @@ namespace Zene.Windowing.Base
 		/// The desired height, in screen coordinates, of the window
 		/// content area.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowSize", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowSize(IntPtr window, int width, int height);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowSize")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowSize(IntPtr window, int width, int height);
 
 		/// <summary>
 		/// Retrieves the size of the framebuffer of the specified window.
@@ -990,8 +1043,9 @@ namespace Zene.Windowing.Base
 		/// Where to store the height, in pixels, of the framebuffer,
 		/// or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetFramebufferSize", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetFramebufferSize(IntPtr window, out int width, out int height);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetFramebufferSize")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetFramebufferSize(IntPtr window, out int width, out int height);
 
 		/// <summary>
 		/// Retrieves the size of the frame of the window.
@@ -1021,8 +1075,9 @@ namespace Zene.Windowing.Base
 		/// Where to store the size, in screen coordinates, of the
 		/// bottom edge of the window frame, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetWindowFrameSize", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetWindowFrameSize(IntPtr window, out int left, out int top, out int right, out int bottom);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetWindowFrameSize")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetWindowFrameSize(IntPtr window, out int left, out int top, out int right, out int bottom);
 
 		/// <summary>
 		/// Retrieves the content scale for the specified window.
@@ -1045,8 +1100,9 @@ namespace Zene.Windowing.Base
 		/// <param name="yscale">
 		/// Where to store the y-axis content scale, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetWindowContentScale", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetWindowContentScale(IntPtr window, out IntPtr xscale, out IntPtr yscale);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetWindowContentScale")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetWindowContentScale(IntPtr window, out IntPtr xscale, out IntPtr yscale);
 
 		/// <summary>
 		/// Returns the opacity of the whole window.
@@ -1060,8 +1116,9 @@ namespace Zene.Windowing.Base
 		/// <returns>
 		/// The opacity value of the specified window.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetWindowOpacity", CallingConvention = CallingConvention.Cdecl)]
-		public static extern float GetWindowOpacity(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetWindowOpacity")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial float GetWindowOpacity(IntPtr window);
 
 		/// <summary>
 		/// Sets the opacity of the whole window.
@@ -1075,8 +1132,9 @@ namespace Zene.Windowing.Base
 		/// <param name="opacity">
 		/// The desired opacity of the specified window.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowOpacity", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowOpacity(IntPtr window, float opacity);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowOpacity")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowOpacity(IntPtr window, float opacity);
 
 		/// <summary>
 		/// Iconifies the specified window.
@@ -1089,8 +1147,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// The window to iconify.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwIconifyWindow", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void IconifyWindow(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwIconifyWindow")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void IconifyWindow(IntPtr window);
 
 		/// <summary>
 		/// Restores the specified window.
@@ -1103,8 +1162,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// The window to restore.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwRestoreWindow", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void RestoreWindow(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwRestoreWindow")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void RestoreWindow(IntPtr window);
 
 		/// <summary>
 		/// Maximizes the specified window.
@@ -1116,8 +1176,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// The window to maximize.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwMaximizeWindow", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void MaximizeWindow(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwMaximizeWindow")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void MaximizeWindow(IntPtr window);
 
 		/// <summary>
 		/// Makes the specified window visible.
@@ -1130,8 +1191,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// The window to make visible.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwShowWindow", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void ShowWindow(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwShowWindow")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void ShowWindow(IntPtr window);
 
 		/// <summary>
 		/// Hides the specified window.
@@ -1144,8 +1206,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// The window to hide.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwHideWindow", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void HideWindow(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwHideWindow")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void HideWindow(IntPtr window);
 
 		/// <summary>
 		/// Brings the specified window to front and sets input focus.
@@ -1157,8 +1220,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// The window to give input focus.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwFocusWindow", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void FocusWindow(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwFocusWindow")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void FocusWindow(IntPtr window);
 
 		/// <summary>
 		/// Requests user attention to the specified window.
@@ -1171,8 +1235,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// The window to request attention to.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwRequestWindowAttention", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void RequestWindowAttention(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwRequestWindowAttention")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void RequestWindowAttention(IntPtr window);
 
 		/// <summary>
 		/// Returns the monitor that the window uses for full screen mode.
@@ -1188,8 +1253,9 @@ namespace Zene.Windowing.Base
 		/// The monitor, or `NULL` if the window is in windowed mode or an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetWindowMonitor", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetWindowMonitor(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetWindowMonitor")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetWindowMonitor(IntPtr window);
 
 		/// <summary>
 		/// Sets the mode, monitor, video mode and placement of a window.
@@ -1224,8 +1290,9 @@ namespace Zene.Windowing.Base
 		/// The desired refresh rate, in Hz, of the video mode,
 		/// or `GLFW_DONT_CARE`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowMonitor", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowMonitor(IntPtr window, IntPtr monitor, int xpos, int ypos, int width, int height, int refreshRate);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowMonitor")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowMonitor(IntPtr window, IntPtr monitor, int xpos, int ypos, int width, int height, int refreshRate);
 
 		/// <summary>
 		/// Returns an attribute of the specified window.
@@ -1245,8 +1312,9 @@ namespace Zene.Windowing.Base
 		/// The value of the attribute, or zero if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetWindowAttrib", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetWindowAttrib(IntPtr window, int attrib);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetWindowAttrib")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int GetWindowAttrib(IntPtr window, int attrib);
 
 		/// <summary>
 		/// Sets an attribute of the specified window.
@@ -1263,8 +1331,9 @@ namespace Zene.Windowing.Base
 		/// <param name="value">
 		/// `GLFW_TRUE` or `GLFW_FALSE`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowAttrib", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowAttrib(IntPtr window, int attrib, int value);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowAttrib")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowAttrib(IntPtr window, int attrib, int value);
 
 		/// <summary>
 		/// Sets the user pointer of the specified window.
@@ -1280,8 +1349,9 @@ namespace Zene.Windowing.Base
 		/// <param name="pointer">
 		/// The new value.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowUserPointer", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetWindowUserPointer(IntPtr window, IntPtr pointer);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowUserPointer")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetWindowUserPointer(IntPtr window, IntPtr pointer);
 
 		/// <summary>
 		/// Returns the user pointer of the specified window.
@@ -1293,8 +1363,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// The window whose pointer to return.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetWindowUserPointer", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetWindowUserPointer(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetWindowUserPointer")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetWindowUserPointer(IntPtr window);
 
 		/// <summary>
 		/// Sets the position callback for the specified window.
@@ -1316,8 +1387,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowPosCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern WindowPosHandler SetWindowPosCallback(IntPtr window, WindowPosHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowPosCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial WindowPosHandler SetWindowPosCallback(IntPtr window, WindowPosHandler cbfun);
 
 		/// <summary>
 		/// Sets the size callback for the specified window.
@@ -1338,8 +1410,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowSizeCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern WindowSizeHandler SetWindowSizeCallback(IntPtr window, WindowSizeHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowSizeCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial WindowSizeHandler SetWindowSizeCallback(IntPtr window, WindowSizeHandler cbfun);
 
 		/// <summary>
 		/// Sets the close callback for the specified window.
@@ -1360,8 +1433,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowCloseCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern WindowCloseHandler SetWindowCloseCallback(IntPtr window, WindowCloseHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowCloseCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial WindowCloseHandler SetWindowCloseCallback(IntPtr window, WindowCloseHandler cbfun);
 
 		/// <summary>
 		/// Sets the refresh callback for the specified window.
@@ -1382,8 +1456,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowRefreshCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern WindowRefreshHandler SetWindowRefreshCallback(IntPtr window, WindowRefreshHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowRefreshCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial WindowRefreshHandler SetWindowRefreshCallback(IntPtr window, WindowRefreshHandler cbfun);
 
 		/// <summary>
 		/// Sets the focus callback for the specified window.
@@ -1403,8 +1478,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowFocusCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern WindowFocusHandler SetWindowFocusCallback(IntPtr window, WindowFocusHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowFocusCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial WindowFocusHandler SetWindowFocusCallback(IntPtr window, WindowFocusHandler cbfun);
 
 		/// <summary>
 		/// Sets the iconify callback for the specified window.
@@ -1424,8 +1500,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowIconifyCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern WindowIconifyHandler SetWindowIconifyCallback(IntPtr window, WindowIconifyHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowIconifyCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial WindowIconifyHandler SetWindowIconifyCallback(IntPtr window, WindowIconifyHandler cbfun);
 
 		/// <summary>
 		/// Sets the maximize callback for the specified window.
@@ -1445,8 +1522,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowMaximizeCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern WindowMaximizeHandler SetWindowMaximizeCallback(IntPtr window, WindowMaximizeHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowMaximizeCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial WindowMaximizeHandler SetWindowMaximizeCallback(IntPtr window, WindowMaximizeHandler cbfun);
 
 		/// <summary>
 		/// Sets the framebuffer resize callback for the specified window.
@@ -1466,8 +1544,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetFramebufferSizeCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern FramebufferSizeHandler SetFramebufferSizeCallback(IntPtr window, FramebufferSizeHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetFramebufferSizeCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial FramebufferSizeHandler SetFramebufferSizeCallback(IntPtr window, FramebufferSizeHandler cbfun);
 
 		/// <summary>
 		/// Sets the window content scale callback for the specified window.
@@ -1487,8 +1566,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetWindowContentScaleCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern WindowContentScaleHandler SetWindowContentScaleCallback(IntPtr window, WindowContentScaleHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetWindowContentScaleCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial WindowContentScaleHandler SetWindowContentScaleCallback(IntPtr window, WindowContentScaleHandler cbfun);
 
 		/// <summary>
 		/// Processes all pending events.
@@ -1498,8 +1578,9 @@ namespace Zene.Windowing.Base
 		/// queue and then returns immediately.  Processing events will cause the window
 		/// and input callbacks associated with those events to be called.
 		/// </remarks>
-		[DllImport(LinkLibrary, EntryPoint = "glfwPollEvents", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void PollEvents();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwPollEvents")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void PollEvents();
 
 		/// <summary>
 		/// Waits until events are queued and processes them.
@@ -1512,8 +1593,9 @@ namespace Zene.Windowing.Base
 		/// will cause the window and input callbacks associated with those events to be
 		/// called.
 		/// </remarks>
-		[DllImport(LinkLibrary, EntryPoint = "glfwWaitEvents", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void WaitEvents();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwWaitEvents")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void WaitEvents();
 
 		/// <summary>
 		/// Waits with timeout until events are queued and processes them.
@@ -1529,8 +1611,9 @@ namespace Zene.Windowing.Base
 		/// <param name="timeout">
 		/// The maximum amount of time, in seconds, to wait.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwWaitEventsTimeout", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void WaitEventsTimeout(double timeout);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwWaitEventsTimeout")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void WaitEventsTimeout(double timeout);
 
 		/// <summary>
 		/// Posts an empty event to the event queue.
@@ -1539,8 +1622,9 @@ namespace Zene.Windowing.Base
 		/// This function posts an empty event from the current thread to the event
 		/// queue, causing @ref WaitEvents or @ref WaitEventsTimeout to return.
 		/// </remarks>
-		[DllImport(LinkLibrary, EntryPoint = "glfwPostEmptyEvent", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void PostEmptyEvent();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwPostEmptyEvent")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void PostEmptyEvent();
 
 		/// <summary>
 		/// Returns the value of an input option for the specified window.
@@ -1557,8 +1641,9 @@ namespace Zene.Windowing.Base
 		/// `GLFW_STICKY_MOUSE_BUTTONS`, `GLFW_LOCK_KEY_MODS` or
 		/// `GLFW_RAW_MOUSE_MOTION`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetInputMode", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetInputMode(IntPtr window, int mode);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetInputMode")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int GetInputMode(IntPtr window, int mode);
 
 		/// <summary>
 		/// Sets an input option for the specified window.
@@ -1578,8 +1663,9 @@ namespace Zene.Windowing.Base
 		/// <param name="value">
 		/// The new value of the specified input mode.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetInputMode", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetInputMode(IntPtr window, int mode, int value);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetInputMode")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetInputMode(IntPtr window, int mode, int value);
 
 		/// <summary>
 		/// Returns whether raw mouse motion is supported.
@@ -1594,8 +1680,9 @@ namespace Zene.Windowing.Base
 		/// `GLFW_TRUE` if raw mouse motion is supported on the current machine,
 		/// or `GLFW_FALSE` otherwise.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwRawMouseMotionSupported", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int RawMouseMotionSupported();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwRawMouseMotionSupported")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int RawMouseMotionSupported();
 
 		/// <summary>
 		/// Returns the layout-specific name of the specified printable key.
@@ -1615,8 +1702,9 @@ namespace Zene.Windowing.Base
 		/// <returns>
 		/// The UTF-8 encoded, layout-specific name of the key, or `NULL`.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetKeyName", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetKeyName(int key, int scancode);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetKeyName")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetKeyName(int key, int scancode);
 
 		/// <summary>
 		/// Returns the platform-specific scancode of the specified key.
@@ -1631,8 +1719,9 @@ namespace Zene.Windowing.Base
 		/// The platform-specific scancode for the key, or `-1` if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetKeyScancode", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetKeyScancode(int key);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetKeyScancode")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int GetKeyScancode(int key);
 
 		/// <summary>
 		/// Returns the last reported state of a keyboard key for the specified
@@ -1654,8 +1743,9 @@ namespace Zene.Windowing.Base
 		/// <returns>
 		/// One of `GLFW_PRESS` or `GLFW_RELEASE`.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetKey", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetKey(IntPtr window, int key);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetKey")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int GetKey(IntPtr window, int key);
 
 		/// <summary>
 		/// Returns the last reported state of a mouse button for the specified
@@ -1675,8 +1765,9 @@ namespace Zene.Windowing.Base
 		/// <returns>
 		/// One of `GLFW_PRESS` or `GLFW_RELEASE`.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetMouseButton", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetMouseButton(IntPtr window, int button);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetMouseButton")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int GetMouseButton(IntPtr window, int button);
 
 		/// <summary>
 		/// Retrieves the position of the cursor relative to the content area of
@@ -1698,8 +1789,9 @@ namespace Zene.Windowing.Base
 		/// Where to store the cursor y-coordinate, relative to the to
 		/// top edge of the content area, or `NULL`.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetCursorPos", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void GetCursorPos(IntPtr window, out double xpos, out double ypos);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetCursorPos")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void GetCursorPos(IntPtr window, out double xpos, out double ypos);
 
 		/// <summary>
 		/// Sets the position of the cursor, relative to the content area of the
@@ -1722,8 +1814,9 @@ namespace Zene.Windowing.Base
 		/// The desired y-coordinate, relative to the top edge of the
 		/// content area.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetCursorPos", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetCursorPos(IntPtr window, double xpos, double ypos);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetCursorPos")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetCursorPos(IntPtr window, double xpos, double ypos);
 
 		/// <summary>
 		/// Creates a custom cursor.
@@ -1746,8 +1839,9 @@ namespace Zene.Windowing.Base
 		/// The handle of the created cursor, or `NULL` if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwCreateCursor", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr CreateCursor(IntPtr image, int xhot, int yhot);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwCreateCursor")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr CreateCursor(IntPtr image, int xhot, int yhot);
 
 		/// <summary>
 		/// Creates a cursor with a standard shape.
@@ -1763,8 +1857,9 @@ namespace Zene.Windowing.Base
 		/// A new cursor ready to use or `NULL` if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwCreateStandardCursor", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr CreateStandardCursor(int shape);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwCreateStandardCursor")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr CreateStandardCursor(int shape);
 
 		/// <summary>
 		/// Destroys a cursor.
@@ -1777,11 +1872,13 @@ namespace Zene.Windowing.Base
 		/// <param name="cursor">
 		/// The cursor object to destroy.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwDestroyCursor", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void DestroyCursor(IntPtr cursor);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwDestroyCursor")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void DestroyCursor(IntPtr cursor);
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetCursor", CallingConvention = CallingConvention.Cdecl)]
-		private static extern void _glfwSetCursor(IntPtr window, IntPtr cursor);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetCursor")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial void _glfwSetCursor(IntPtr window, IntPtr cursor);
 
 		/// <summary>
 		/// Sets the key callback.
@@ -1801,8 +1898,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetKeyCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern KeyChangeHandler SetKeyCallback(IntPtr window, KeyChangeHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetKeyCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial KeyChangeHandler SetKeyCallback(IntPtr window, KeyChangeHandler cbfun);
 
 		/// <summary>
 		/// Sets the Unicode character callback.
@@ -1822,8 +1920,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetCharCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern CharHandler SetCharCallback(IntPtr window, CharHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetCharCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial CharHandler SetCharCallback(IntPtr window, CharHandler cbfun);
 
 		/// <summary>
 		/// Sets the Unicode character with modifiers callback.
@@ -1844,8 +1943,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetCharModsCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern CharModsHandler SetCharModsCallback(IntPtr window, CharModsHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetCharModsCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial CharModsHandler SetCharModsCallback(IntPtr window, CharModsHandler cbfun);
 
 		/// <summary>
 		/// Sets the mouse button callback.
@@ -1865,8 +1965,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetMouseButtonCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern MouseButtonHandler SetMouseButtonCallback(IntPtr window, MouseButtonHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetMouseButtonCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial MouseButtonHandler SetMouseButtonCallback(IntPtr window, MouseButtonHandler cbfun);
 
 		/// <summary>
 		/// Sets the cursor position callback.
@@ -1888,8 +1989,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetCursorPosCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern MousePosHandler SetCursorPosCallback(IntPtr window, MousePosHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetCursorPosCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial MousePosHandler SetCursorPosCallback(IntPtr window, MousePosHandler cbfun);
 
 		/// <summary>
 		/// Sets the cursor enter/exit callback.
@@ -1910,8 +2012,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetCursorEnterCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern MouseEnterHandler SetCursorEnterCallback(IntPtr window, MouseEnterHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetCursorEnterCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial MouseEnterHandler SetCursorEnterCallback(IntPtr window, MouseEnterHandler cbfun);
 
 		/// <summary>
 		/// Sets the scroll callback.
@@ -1932,8 +2035,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetScrollCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern ScrollHandler SetScrollCallback(IntPtr window, ScrollHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetScrollCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial ScrollHandler SetScrollCallback(IntPtr window, ScrollHandler cbfun);
 
 		/// <summary>
 		/// Sets the file drop callback.
@@ -1953,8 +2057,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetDropCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern FileDropHandler SetDropCallback(IntPtr window, FileDropHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetDropCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial FileDropHandler SetDropCallback(IntPtr window, FileDropHandler cbfun);
 
 		/// <summary>
 		/// Returns whether the specified joystick is present.
@@ -1968,14 +2073,17 @@ namespace Zene.Windowing.Base
 		/// <returns>
 		/// `GLFW_TRUE` if the joystick is present, or `GLFW_FALSE` otherwise.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwJoystickPresent", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int JoystickPresent(int jid);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwJoystickPresent")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int JoystickPresent(int jid);
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetJoystickAxes", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr _glfwGetJoystickAxes(int jid, out int count);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickAxes")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial IntPtr _glfwGetJoystickAxes(int jid, out int count);
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetJoystickButtons", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr _glfwGetJoystickButtons(int jid, out int count);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickButtons")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial IntPtr _glfwGetJoystickButtons(int jid, out int count);
 
 		/// <summary>
 		/// Returns the state of all hats of the specified joystick.
@@ -1996,8 +2104,9 @@ namespace Zene.Windowing.Base
 		/// An array of hat states, or `NULL` if the joystick is not present
 		/// or an [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetJoystickHats", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetJoystickHats(int jid, out int count);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickHats")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetJoystickHats(int jid, out int count);
 
 		/// <summary>
 		/// Returns the name of the specified joystick.
@@ -2014,8 +2123,9 @@ namespace Zene.Windowing.Base
 		/// The UTF-8 encoded name of the joystick, or `NULL` if the joystick
 		/// is not present or an [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetJoystickName", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetJoystickName(int jid);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickName", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial string GetJoystickName(int jid);
 
 		/// <summary>
 		/// Returns the SDL comaptible GUID of the specified joystick.
@@ -2032,8 +2142,9 @@ namespace Zene.Windowing.Base
 		/// The UTF-8 encoded GUID of the joystick, or `NULL` if the joystick
 		/// is not present or an [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetJoystickGUID", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetJoystickGUID(int jid);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickGUID", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial string GetJoystickGUID(int jid);
 
 		/// <summary>
 		/// Sets the user pointer of the specified joystick.
@@ -2049,8 +2160,9 @@ namespace Zene.Windowing.Base
 		/// <param name="pointer">
 		/// The new value.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetJoystickUserPointer", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetJoystickUserPointer(int jid, IntPtr pointer);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetJoystickUserPointer")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetJoystickUserPointer(int jid, IntPtr pointer);
 
 		/// <summary>
 		/// Returns the user pointer of the specified joystick.
@@ -2062,8 +2174,9 @@ namespace Zene.Windowing.Base
 		/// <param name="jid">
 		/// The joystick whose pointer to return.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetJoystickUserPointer", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetJoystickUserPointer(int jid);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickUserPointer")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetJoystickUserPointer(int jid);
 
 		/// <summary>
 		/// Returns whether the specified joystick has a gamepad mapping.
@@ -2079,8 +2192,9 @@ namespace Zene.Windowing.Base
 		/// `GLFW_TRUE` if a joystick is both present and has a gamepad mapping,
 		/// or `GLFW_FALSE` otherwise.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwJoystickIsGamepad", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int JoystickIsGamepad(int jid);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwJoystickIsGamepad")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int JoystickIsGamepad(int jid);
 
 		/// <summary>
 		/// Sets the joystick configuration callback.
@@ -2098,8 +2212,9 @@ namespace Zene.Windowing.Base
 		/// The previously set callback, or `NULL` if no callback was set or the
 		/// library had not been [initialized](@ref intro_init).
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetJoystickCallback", CallingConvention = CallingConvention.Cdecl)]
-		public static extern JoystickHandler SetJoystickCallback(JoystickHandler cbfun);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetJoystickCallback")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial JoystickHandler SetJoystickCallback(JoystickHandler cbfun);
 
 		/// <summary>
 		/// Adds the specified SDL_GameControllerDB gamepad mappings.
@@ -2118,8 +2233,9 @@ namespace Zene.Windowing.Base
 		/// `GLFW_TRUE` if successful, or `GLFW_FALSE` if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwUpdateGamepadMappings", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int UpdateGamepadMappings(string @string);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwUpdateGamepadMappings", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int UpdateGamepadMappings(string @string);
 
 		/// <summary>
 		/// Returns the human-readable gamepad name for the specified joystick.
@@ -2136,8 +2252,9 @@ namespace Zene.Windowing.Base
 		/// joystick is not present, does not have a mapping or an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetGamepadName", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetGamepadName(int jid);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetGamepadName")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetGamepadName(int jid);
 
 		/// <summary>
 		/// Retrieves the state of the specified joystick remapped as a gamepad.
@@ -2157,8 +2274,9 @@ namespace Zene.Windowing.Base
 		/// connected, it has no gamepad mapping or an [error](@ref error_handling)
 		/// occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetGamepadState", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetGamepadState(int jid, out IntPtr state);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetGamepadState")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int GetGamepadState(int jid, out IntPtr state);
 
 		/// <summary>
 		/// Sets the clipboard to the specified string.
@@ -2173,8 +2291,9 @@ namespace Zene.Windowing.Base
 		/// <param name="string">
 		/// A UTF-8 encoded string.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetClipboardString", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetClipboardString(IntPtr window, string @string);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetClipboardString", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetClipboardString(IntPtr window, string @string);
 
 		/// <summary>
 		/// Returns the contents of the clipboard as a string.
@@ -2192,8 +2311,9 @@ namespace Zene.Windowing.Base
 		/// The contents of the clipboard as a UTF-8 encoded string, or `NULL`
 		/// if an [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetClipboardString", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetClipboardString(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetClipboardString", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial string GetClipboardString(IntPtr window);
 
 		/// <summary>
 		/// Returns the value of the GLFW timer.
@@ -2207,8 +2327,9 @@ namespace Zene.Windowing.Base
 		/// The current value, in seconds, or zero if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetTime", CallingConvention = CallingConvention.Cdecl)]
-		public static extern double GetTime();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetTime")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial double GetTime();
 
 		/// <summary>
 		/// Sets the GLFW timer.
@@ -2221,8 +2342,9 @@ namespace Zene.Windowing.Base
 		/// <param name="time">
 		/// The new value, in seconds.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSetTime", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SetTime(double time);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSetTime")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SetTime(double time);
 
 		/// <summary>
 		/// Returns the current value of the raw timer.
@@ -2236,8 +2358,9 @@ namespace Zene.Windowing.Base
 		/// The value of the timer, or zero if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetTimerValue", CallingConvention = CallingConvention.Cdecl)]
-		public static extern ulong GetTimerValue();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetTimerValue")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial ulong GetTimerValue();
 
 		/// <summary>
 		/// Returns the frequency, in Hz, of the raw timer.
@@ -2249,11 +2372,13 @@ namespace Zene.Windowing.Base
 		/// The frequency of the timer, in Hz, or zero if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetTimerFrequency", CallingConvention = CallingConvention.Cdecl)]
-		public static extern ulong GetTimerFrequency();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetTimerFrequency")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial ulong GetTimerFrequency();
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwMakeContextCurrent", CallingConvention = CallingConvention.Cdecl)]
-		private static extern void _glfwMakeContextCurrent(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwMakeContextCurrent")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial void _glfwMakeContextCurrent(IntPtr window);
 
 		/// <summary>
 		/// Returns the window whose context is current on the calling thread.
@@ -2266,8 +2391,9 @@ namespace Zene.Windowing.Base
 		/// The window whose context is current, or `NULL` if no window's
 		/// context is current.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetCurrentContext", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetCurrentContext();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetCurrentContext")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetCurrentContext();
 
 		/// <summary>
 		/// Swaps the front and back buffers of the specified window.
@@ -2281,8 +2407,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// The window whose buffers to swap.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSwapBuffers", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SwapBuffers(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSwapBuffers")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SwapBuffers(IntPtr window);
 
 		/// <summary>
 		/// Sets the swap interval for the current context.
@@ -2298,8 +2425,9 @@ namespace Zene.Windowing.Base
 		/// The minimum number of screen updates to wait for
 		/// until the buffers are swapped by @ref SwapBuffers.
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwSwapInterval", CallingConvention = CallingConvention.Cdecl)]
-		public static extern void SwapInterval(int interval);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwSwapInterval")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial void SwapInterval(int interval);
 
 		/// <summary>
 		/// Returns whether the specified extension is available.
@@ -2317,8 +2445,9 @@ namespace Zene.Windowing.Base
 		/// `GLFW_TRUE` if the extension is available, or `GLFW_FALSE`
 		/// otherwise.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwExtensionSupported", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int ExtensionSupported(string extension);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwExtensionSupported", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int ExtensionSupported(string extension);
 
 		/// <summary>
 		/// Returns the address of the specified function for the current
@@ -2336,8 +2465,9 @@ namespace Zene.Windowing.Base
 		/// The address of the function, or `NULL` if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetProcAddress", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetProcAddress(string procname);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetProcAddress", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetProcAddress(string procname);
 
 		/// <summary>
 		/// Returns whether the Vulkan loader and an ICD have been found.
@@ -2350,11 +2480,13 @@ namespace Zene.Windowing.Base
 		/// `GLFW_TRUE` if Vulkan is minimally available, or `GLFW_FALSE`
 		/// otherwise.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwVulkanSupported", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int VulkanSupported();
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwVulkanSupported")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int VulkanSupported();
 
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetRequiredInstanceExtensions", CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntPtr _glfwGetRequiredInstanceExtensions(out uint count);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetRequiredInstanceExtensions")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		private static partial IntPtr _glfwGetRequiredInstanceExtensions(out uint count);
 
 		/// <summary>
 		/// Returns the address of the specified Vulkan instance function.
@@ -2376,8 +2508,9 @@ namespace Zene.Windowing.Base
 		/// The address of the function, or `NULL` if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetInstanceProcAddress", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetInstanceProcAddress(IntPtr instance, string procname);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetInstanceProcAddress", StringMarshalling = StringMarshalling.Utf8)]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetInstanceProcAddress(IntPtr instance, string procname);
 
 		/// <summary>
 		/// Returns whether the specified queue family can present images.
@@ -2399,8 +2532,9 @@ namespace Zene.Windowing.Base
 		/// `GLFW_TRUE` if the queue family supports presentation, or
 		/// `GLFW_FALSE` otherwise.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetPhysicalDevicePresentationSupport", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int GetPhysicalDevicePresentationSupport(IntPtr instance, IntPtr device, uint queuefamily);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetPhysicalDevicePresentationSupport")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int GetPhysicalDevicePresentationSupport(IntPtr instance, IntPtr device, uint queuefamily);
 
 		/// <summary>
 		/// Creates a Vulkan surface for the specified window.
@@ -2426,8 +2560,9 @@ namespace Zene.Windowing.Base
 		/// `VK_SUCCESS` if successful, or a Vulkan error code if an
 		/// [error](@ref error_handling) occurred.
 		/// </returns>
-		[DllImport(LinkLibrary, EntryPoint = "glfwCreateWindowSurface", CallingConvention = CallingConvention.Cdecl)]
-		public static extern int CreateWindowSurface(IntPtr instance, IntPtr window, IntPtr allocator, out IntPtr surface);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwCreateWindowSurface")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial int CreateWindowSurface(IntPtr instance, IntPtr window, IntPtr allocator, out IntPtr surface);
 
 		/// <summary>
 		/// 
@@ -2438,8 +2573,9 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// 
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetWin32Window", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetWin32Window(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetWin32Window")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetWin32Window(IntPtr window);
 
 		/// <summary>
 		/// 
@@ -2450,30 +2586,32 @@ namespace Zene.Windowing.Base
 		/// <param name="window">
 		/// 
 		/// </param>
-		[DllImport(LinkLibrary, EntryPoint = "glfwGetX11Window", CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr GetX11Window(IntPtr window);
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetX11Window")]
+        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		public static partial IntPtr GetX11Window(IntPtr window);
 
-		//[DllImport(LinkLibrary, EntryPoint = "glfwGetCocoaWindow", CallingConvention = CallingConvention.Cdecl)]
-		//public static extern IntPtr _glfwGetCocoaWindow(IntPtr window);
+        //[LibraryImport(LinkLibrary, EntryPoint = "glfwGetCocoaWindow")]
+        //[UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+		//public static partial IntPtr _glfwGetCocoaWindow(IntPtr window);
 
-		/// <summary>
-		/// Returns a string describing the compile-time configuration.
-		/// </summary>
-		/// <remarks>
-		/// This function returns the compile-time generated
-		/// [version string](@ref intro_version_string) of the GLFW library binary.  It
-		/// describes the version, platform, compiler and any platform-specific
-		/// compile-time options.  It should not be confused with the OpenGL or OpenGL
-		/// ES version string, queried with `glGetString`.
-		/// </remarks>
-		/// <returns>
-		/// The ASCII encoded GLFW version string.
-		/// </returns>
-		public static string GetVersionString()
-		{
-			var versionStringPtr = _glfwGetVersionString();
-			return Marshal.PtrToStringAnsi(versionStringPtr);
-		}
+		///// <summary>
+		///// Returns a string describing the compile-time configuration.
+		///// </summary>
+		///// <remarks>
+		///// This function returns the compile-time generated
+		///// [version string](@ref intro_version_string) of the GLFW library binary.  It
+		///// describes the version, platform, compiler and any platform-specific
+		///// compile-time options.  It should not be confused with the OpenGL or OpenGL
+		///// ES version string, queried with `glGetString`.
+		///// </remarks>
+		///// <returns>
+		///// The ASCII encoded GLFW version string.
+		///// </returns>
+		//public static string GetVersionString()
+		//{
+		//	var versionStringPtr = _glfwGetVersionString();
+		//	return Marshal.PtrToStringAnsi(versionStringPtr);
+		//}
 
 		/// <summary>
 		/// Returns the currently connected monitors.
