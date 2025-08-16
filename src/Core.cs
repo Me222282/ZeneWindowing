@@ -15,6 +15,8 @@ global using Maths =
 #pragma warning restore CS8981
 
 using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using Zene.Graphics;
 using Zene.Windowing.Base;
 
@@ -30,6 +32,11 @@ namespace Zene.Windowing
         public static void Init()
         {
             if (_initialised) { return; }
+
+#if UNIX
+            // Dumb fix for microsofts incompetency
+            NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), GLFW.ResolveRelativeDependencies);
+#endif
 
             if (GLFW.Init() == GLFW.False)
             {

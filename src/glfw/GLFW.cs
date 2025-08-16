@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -15,7 +17,7 @@ namespace Zene.Windowing.Base
 #if WINDOWS
 		private const string LinkLibrary = "glfw/win64/glfw3";
 #elif UNIX
-		private const string LinkLibrary = "glfw/os64/libglfw";
+        private const string LinkLibrary = "GLFW";//"glfw/os64/libglfw";
 #endif
 
 		public const int VersionMajor = 3;
@@ -371,6 +373,20 @@ namespace Zene.Windowing.Base
 
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
 		public delegate void JoystickHandler(int jid, int @event);
+
+#if UNIX
+		internal static IntPtr ResolveRelativeDependencies(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+		{
+			if (libraryName == "GLFW")
+			{
+                string exeFolder = AppDomain.CurrentDomain.BaseDirectory;
+                return NativeLibrary.Load(Path.Combine(exeFolder, "glfw/os64/libglfw.so"), assembly, searchPath);
+            }
+			
+			// Use default in all other cases
+            return IntPtr.Zero;
+        }
+#endif
 
 		/// <summary>
 		/// Initializes the GLFW library.
