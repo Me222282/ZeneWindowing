@@ -318,19 +318,17 @@ namespace Zene.Windowing
             get => (CursorMode)GLFW.GetInputMode(_window, GLFW.Cursor);
             set => GLFW.SetInputMode(_window, GLFW.Cursor, (int)value);
         }
-
-        private readonly object _focusedRef = new object();
-        private bool _focused;
+        
+        /// <summary>
+        /// Setting to false does nothing
+        /// </summary>
         public bool Focused
         {
-            get => _focused;
+            get => GLFW.GetWindowAttrib(_window, GLFW.Focused) != 0;
             set
             {
-                GLFW.SetWindowAttrib(_window, GLFW.Focused, value ? GLFW.True : GLFW.False);
-                lock (_focusedRef)
-                {
-                    _focused = value;
-                }
+                // GLFW.SetWindowAttrib(_window, GLFW.Focused, value ? GLFW.True : GLFW.False);
+                if (value) { GLFW.FocusWindow(_window); }
             }
         }
 
@@ -412,8 +410,6 @@ namespace Zene.Windowing
 
         private void SetProps(WindowInitProperties props)
         {
-            _focused = props.Focused;
-
             GLFW.GetWindowPos(_window, out int x, out int y);
             _pos = new Vector2I(x, y);
 
@@ -709,11 +705,6 @@ namespace Zene.Windowing
         }
         protected virtual void OnFocus(FocusedEventArgs e)
         {
-            lock (_focusedRef)
-            {
-                _focused = true;
-            }
-
             Focus?.Invoke(this, e);
         }
         protected virtual void OnRefresh(EventArgs e)
