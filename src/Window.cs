@@ -355,8 +355,8 @@ namespace Zene.Windowing
 
         public string ClipBoard
         {
-            set => GLFW.SetClipboardString(_window, value);
-            get => Marshal.PtrToStringUTF8(GLFW.GetClipboardString(_window));//GLFW.GetClipboardString(_window);
+            set => GLFW.SetClipboardString(_window, value ?? "");
+            get => Marshal.PtrToStringUTF8(GLFW.GetClipboardString(_window)) ?? "";//GLFW.GetClipboardString(_window);
         }
 
         public MouseButton MouseButton { get; private set; }
