@@ -314,7 +314,7 @@ namespace Zene.Windowing.Base
 
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
 		public delegate void ErrorHandler(int error,
-			[MarshalAs(UnmanagedType.LPUTF8Str)]
+			// [MarshalAs(UnmanagedType.LPUTF8Str)]
 			string description);
 
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl), SuppressUnmanagedCodeSecurity]
@@ -468,9 +468,9 @@ namespace Zene.Windowing.Base
         /// <returns>
         /// The ASCII encoded GLFW version string.
         /// </returns>
-        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetVersionString", StringMarshalling = StringMarshalling.Utf8)]
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetVersionString")]//, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        public static partial string GetVersionString();
+        public static partial IntPtr _glfwGetVersionString();
 
 		/// <summary>
 		/// Returns and clears the last error for the calling thread.
@@ -2139,9 +2139,9 @@ namespace Zene.Windowing.Base
 		/// The UTF-8 encoded name of the joystick, or `NULL` if the joystick
 		/// is not present or an [error](@ref error_handling) occurred.
 		/// </returns>
-        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickName", StringMarshalling = StringMarshalling.Utf8)]
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickName")]//, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-		public static partial string GetJoystickName(int jid);
+		public static partial IntPtr GetJoystickName(int jid);
 
 		/// <summary>
 		/// Returns the SDL comaptible GUID of the specified joystick.
@@ -2158,9 +2158,9 @@ namespace Zene.Windowing.Base
 		/// The UTF-8 encoded GUID of the joystick, or `NULL` if the joystick
 		/// is not present or an [error](@ref error_handling) occurred.
 		/// </returns>
-        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickGUID", StringMarshalling = StringMarshalling.Utf8)]
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetJoystickGUID")]//, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-		public static partial string GetJoystickGUID(int jid);
+		public static partial IntPtr GetJoystickGUID(int jid);
 
 		/// <summary>
 		/// Sets the user pointer of the specified joystick.
@@ -2327,9 +2327,9 @@ namespace Zene.Windowing.Base
 		/// The contents of the clipboard as a UTF-8 encoded string, or `NULL`
 		/// if an [error](@ref error_handling) occurred.
 		/// </returns>
-        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetClipboardString", StringMarshalling = StringMarshalling.Utf8)]
+        [LibraryImport(LinkLibrary, EntryPoint = "glfwGetClipboardString")]//, StringMarshalling = StringMarshalling.Utf8)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-		public static partial string GetClipboardString(IntPtr window);
+		public static partial IntPtr GetClipboardString(IntPtr window);
 
 		/// <summary>
 		/// Returns the value of the GLFW timer.
@@ -2610,24 +2610,24 @@ namespace Zene.Windowing.Base
         //[UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
 		//public static partial IntPtr _glfwGetCocoaWindow(IntPtr window);
 
-		///// <summary>
-		///// Returns a string describing the compile-time configuration.
-		///// </summary>
-		///// <remarks>
-		///// This function returns the compile-time generated
-		///// [version string](@ref intro_version_string) of the GLFW library binary.  It
-		///// describes the version, platform, compiler and any platform-specific
-		///// compile-time options.  It should not be confused with the OpenGL or OpenGL
-		///// ES version string, queried with `glGetString`.
-		///// </remarks>
-		///// <returns>
-		///// The ASCII encoded GLFW version string.
-		///// </returns>
-		//public static string GetVersionString()
-		//{
-		//	var versionStringPtr = _glfwGetVersionString();
-		//	return Marshal.PtrToStringAnsi(versionStringPtr);
-		//}
+		/// <summary>
+		/// Returns a string describing the compile-time configuration.
+		/// </summary>
+		/// <remarks>
+		/// This function returns the compile-time generated
+		/// [version string](@ref intro_version_string) of the GLFW library binary.  It
+		/// describes the version, platform, compiler and any platform-specific
+		/// compile-time options.  It should not be confused with the OpenGL or OpenGL
+		/// ES version string, queried with `glGetString`.
+		/// </remarks>
+		/// <returns>
+		/// The ASCII encoded GLFW version string.
+		/// </returns>
+		public static string GetVersionString()
+		{
+			var versionStringPtr = _glfwGetVersionString();
+			return Marshal.PtrToStringAnsi(versionStringPtr);
+		}
 
 		/// <summary>
 		/// Returns the currently connected monitors.
